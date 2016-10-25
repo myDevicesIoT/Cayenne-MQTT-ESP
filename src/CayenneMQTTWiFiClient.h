@@ -1,0 +1,67 @@
+/*
+The MIT License(MIT)
+
+Cayenne Arduino Client Library
+Copyright © 2016 myDevices
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files(the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and / or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions :
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+This software uses open source arduino-mqtt library - see MQTTClient-LICENSE.md
+*/
+
+#ifndef _CAYENNEMQTTWIFICLIENT_h
+#define _CAYENNEMQTTWIFICLIENT_h
+
+#include "CayenneArduinoMQTTClient.h"
+
+class CayenneMQTTWiFiClient : public CayenneArduinoMQTTClient
+{
+public:
+	/**
+	* Begins Cayenne session
+	* @param token Authentication token from Cayenne site
+	* @param clientID Cayennne client ID
+	* @param username Cayenne username
+	* @param password Cayenne password
+	* @param ssid WiFi network id
+	* @param wifiPassword WiFi network password
+	*/
+	void begin(const char* clientID, const char* username, const char* password, const char* ssid, const char* wifiPassword)
+	{
+		int status = WL_IDLE_STATUS;
+		if (WiFi.status() == WL_NO_SHIELD) {
+			CAYENNE_LOG("WiFi shield not present");
+			while (true);
+		}
+
+		CAYENNE_LOG("Connecting to %s", ssid);
+		while (WL_CONNECTED != status) {
+			if (wifiPassword && strlen(wifiPassword)) {
+				status = WiFi.begin((char*)ssid, (char*)wifiPassword);
+			}
+			else {
+				status = WiFi.begin((char*)ssid);
+			}
+			delay(5000);
+			CAYENNE_LOG("Connnection failed, retrying");
+		}
+		IPAddress local_ip = WiFi.localIP();
+		CAYENNE_LOG("Local IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
+		CayenneArduinoMQTTClient::begin(_wifiClient, clientID, username, password, WRITE_CHUNK_SIZE);
+	}
+
+private:
+	WiFiClient _wifiClient;
+};
+
+CayenneMQTTWiFiClient Cayenne;
+
+#endif
