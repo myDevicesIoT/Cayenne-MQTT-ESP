@@ -1,21 +1,23 @@
-// This example shows how to connect to the Cayenne MQTT broker using a WiFi shield and send some sample data.
+// This example shows how to connect to Cayenne using a WiFi shield and send/receive sample data.
 
-#define CAYENNE_DEBUG
+//#define CAYENNE_DEBUG
 #define CAYENNE_PRINT Serial
 #include <CayenneMQTTWiFi.h>
 
+// WiFi network info.
+char ssid[] = "ssid";
+char wifiPassword[] = "wifiPassword";
+
+// Cayenne authentication info. This should be obtained from the Cayenne Dashboard.
+char username[] = "MQTT_USERNAME";
+char password[] = "MQTT_PASSWORD";
+char clientID[] = "CLIENT_ID";
+
 unsigned long lastMillis = 0;
-
-char *ssid = "ssid";
-char *wifiPassword = "pass";
-
-char username[] = "username";
-char clientID[] = "arduino_id";
-char password[] = "password";
 
 void setup() {
 	Serial.begin(9600);
-	Cayenne.begin(clientID, username, password, ssid, wifiPassword);
+	Cayenne.begin(username, password, clientID, ssid, wifiPassword);
 }
 
 void loop() {
@@ -23,44 +25,13 @@ void loop() {
 
 	if (millis() - lastMillis > 10000) {
 		lastMillis = millis();
-		//char buffer[64];
-		//CayenneValueArray values(buffer, sizeof(buffer));
-		//values.add("lat", 3.45);
-		//values.add("long", 7.89);
-		//Cayenne.virtualWrite(10, values, "gps");
-		//Cayenne.virtualWrite(0, lastMillis);
-		//Cayenne.virtualWrite(0, digitalRead(0), DISTANCE);
-		//Cayenne.virtualWrite(0, digitalRead(0), DISTANCE, MILLIMETER);
-		//Cayenne.celsiusWrite(0, 10.25);
-		//Cayenne.fahrenheitWrite(0, 11.25);
-		//Cayenne.kelvinWrite(0, 12.25);
-		//Cayenne.luxWrite(0, 13.25);
-		//Cayenne.pascalWrite(0, 14.25);
-		//Cayenne.hectoPascalWrite(0, 15.25);
-		//Cayenne.relativeHumidityWrite(0, 16.25);
+		//Write data to Cayenne here. This example just sends the current uptime in milliseconds.
+		Cayenne.virtualWrite(0, lastMillis);
 	}
-}
-
-CAYENNE_CONNECTED()
-{
-	CAYENNE_LOG("CAYENNE_CONNECTED");
-}
-
-CAYENNE_DISCONNECTED()
-{
-	CAYENNE_LOG("CAYENNE_DISCONNECTED");
 }
 
 CAYENNE_IN_DEFAULT()
 {
 	CAYENNE_LOG("CAYENNE_IN_DEFAULT(%u) - %s, %s", request.pin, getValue.getId(), getValue.asString());
-	Serial.flush();
-	if (strcmp(getValue.asStr(), "error") == 0) {
-		getValue.setError("Error message");
-	}
-}
-
-CAYENNE_OUT_DEFAULT()
-{
-	CAYENNE_LOG("CAYENNE_OUT_DEFAULT(%u)", request.pin);
+	//Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
 }

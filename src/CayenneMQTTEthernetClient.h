@@ -27,12 +27,12 @@ class CayenneMQTTEthernetClient : public CayenneArduinoMQTTClient
 public:
 	/**
 	* Begins Cayenne session
-	* @param clientID Cayennne client ID
 	* @param username Cayenne username
 	* @param password Cayenne password
+	* @param clientID Cayennne client ID
 	* @param mac Mac address for device
 	*/
-	void begin(char* clientID, char* username, char* password, const byte mac[] = NULL)
+	void begin(const char* username, const char* password, const char* clientID, const byte mac[] = NULL)
 	{
 		byte* macAddress = (byte*)GetMACAddress(clientID, mac);
 		while (!Ethernet.begin(macAddress)) {
@@ -41,42 +41,42 @@ public:
 		}
 		IPAddress local_ip = Ethernet.localIP();
 		CAYENNE_LOG("IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
-		CayenneArduinoMQTTClient::begin(_ethernetClient, clientID, username, password);
+		CayenneArduinoMQTTClient::begin(_ethernetClient, username, password, clientID);
 	}
 
 	/**
 	* Begins Cayenne session
-	* @param clientID Cayennne client ID
 	* @param username Cayenne username
 	* @param password Cayenne password
+	* @param clientID Cayennne client ID
 	* @param local Static IP address of device
 	* @param mac Mac address for device
 	*/
-	void begin(char* clientID, char* username, char* password, IPAddress local, const byte mac[] = NULL)
+	void begin(const char* username, const char* password, const char* clientID, IPAddress local, const byte mac[] = NULL)
 	{
 		Ethernet.begin((byte*)GetMACAddress(clientID, mac), local);
 		IPAddress local_ip = Ethernet.localIP();
 		CAYENNE_LOG("IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
-		CayenneArduinoMQTTClient::begin(_ethernetClient, clientID, username, password);
+		CayenneArduinoMQTTClient::begin(_ethernetClient, username, password, clientID);
 	}
 
 	/**
 	* Begins Cayenne session
-	* @param clientID Cayennne client ID
 	* @param username Cayenne username
 	* @param password Cayenne password
+	* @param clientID Cayennne client ID
 	* @param local Static IP address of device
 	* @param dns IP address of DNS server
 	* @param gateway IP address of gateway
 	* @param subnet Subnet mask
 	* @param mac Mac address for device
 	*/
-	void begin(char* clientID, char* username, char* password, IPAddress local, IPAddress dns, IPAddress gateway, IPAddress subnet, const byte mac[] = NULL)
+	void begin(const char* username, const char* password, const char* clientID, IPAddress local, IPAddress dns, IPAddress gateway, IPAddress subnet, const byte mac[] = NULL)
 	{
 		Ethernet.begin((byte*)GetMACAddress(clientID, mac), local, dns, gateway, subnet);
 		IPAddress local_ip = Ethernet.localIP();
 		CAYENNE_LOG("IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
-		CayenneArduinoMQTTClient::begin(_ethernetClient, clientID, username, password);
+		CayenneArduinoMQTTClient::begin(_ethernetClient, username, password, clientID);
 	}
 
 private:

@@ -22,19 +22,24 @@ This software uses open source arduino-mqtt library - see MQTTClient-LICENSE.md
 
 #include "CayenneArduinoMQTTClient.h"
 
+#ifndef WRITE_CHUNK_SIZE
+#define WRITE_CHUNK_SIZE 0 // The chunk size to use when sending data, 0 means data will not be sent in chunks.
+#endif // !WRITE_CHUNK_SIZE
+
+
 class CayenneMQTTWiFiClient : public CayenneArduinoMQTTClient
 {
 public:
 	/**
 	* Begins Cayenne session
 	* @param token Authentication token from Cayenne site
-	* @param clientID Cayennne client ID
 	* @param username Cayenne username
 	* @param password Cayenne password
+	* @param clientID Cayennne client ID
 	* @param ssid WiFi network id
 	* @param wifiPassword WiFi network password
 	*/
-	void begin(const char* clientID, const char* username, const char* password, const char* ssid, const char* wifiPassword)
+	void begin(const char* username, const char* password, const char* clientID, const char* ssid, const char* wifiPassword)
 	{
 		int status = WL_IDLE_STATUS;
 		if (WiFi.status() == WL_NO_SHIELD) {
@@ -55,7 +60,7 @@ public:
 		}
 		IPAddress local_ip = WiFi.localIP();
 		CAYENNE_LOG("Local IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
-		CayenneArduinoMQTTClient::begin(_wifiClient, clientID, username, password, WRITE_CHUNK_SIZE);
+		CayenneArduinoMQTTClient::begin(_wifiClient, username, password, clientID, WRITE_CHUNK_SIZE);
 	}
 
 private:

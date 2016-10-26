@@ -38,14 +38,14 @@ public:
 	/**
 	* Initializes Cayenne
 	* @param client The networking client
-	* @param clientID Cayennne client ID
 	* @param username Cayenne username
-	* @param password Password
+	* @param password Cayenne password
+	* @param clientID Cayennne client ID
 	* @param chunkSize Size of chunks to use when writing the send buffer to the client, 0 to just send the full buffer.
 	*/
-	bool begin(Client& client, char* clientID, char* username, char* password, int chunkSize = 0) {
+	void begin(Client& client, const char* username, const char* password, const char* clientID, int chunkSize = 0) {
 		NetworkInit(&_network, &client, chunkSize);
-		CayenneMQTTClientInit(&_mqttClient, &_network, username, clientID, password, CayenneMessageArrived);
+		CayenneMQTTClientInit(&_mqttClient, &_network, username, password, clientID, CayenneMessageArrived);
 		connect();
 	}
 

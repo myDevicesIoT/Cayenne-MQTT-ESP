@@ -1,8 +1,8 @@
 /*
 The MIT License(MIT)
 
-Cayenne Arduino Client Library
-Copyright © 2016 myDevices
+Cayenne MQTT Client Library
+Copyright (c) 2016 myDevices
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files(the "Software"), to deal in the Software without restriction, including without limitation
@@ -57,12 +57,13 @@ void MQTTMessageArrived(MessageData* md, void* userData)
 /**
 * Create an Cayenne MQTT client object
 * @param[out] client The initialized client object
+* @param[out] network The network connection
 * @param[in] username Cayenne username
+* @param[in] password Cayenne password
 * @param[in] clientID Cayennne client ID
-* @param[in] password Password
 * @param[in] defaultHandler Default MQTT message handler, can be NULL
 */
-void CayenneMQTTClientInit(CayenneMQTTClient* client, Network* network, char* username, char* clientID, char* password, CayenneMessageHandler defaultHandler)
+void CayenneMQTTClientInit(CayenneMQTTClient* client, Network* network, const char* username, const char* password, const char* clientID, CayenneMessageHandler defaultHandler)
 {
 	int i;
 	MQTTClientInit(&client->mqttClient, network, 30000, client->sendbuf, CAYENNE_MAX_MESSAGE_SIZE, client->readbuf, CAYENNE_MAX_MESSAGE_SIZE);
@@ -77,21 +78,22 @@ void CayenneMQTTClientInit(CayenneMQTTClient* client, Network* network, char* us
 	client->mqttClient.defaultMessageHandler = MQTTMessageArrived;
 	client->mqttClient.userData = client;
 	client->username = username;
-	client->clientID = clientID;
 	client->password = password;
+	client->clientID = clientID;
 }
 
 /**
 * Connect to the Cayenne server
 * @param[in] client The client object
+* @return success code
 */
 int CayenneMQTTConnect(CayenneMQTTClient* client)
 {
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.MQTTVersion = 3;
-	data.clientID.cstring = client->clientID;
-	data.username.cstring = client->username;
-	data.password.cstring = client->password;
+	data.clientID.cstring = (char*)client->clientID;
+	data.username.cstring = (char*)client->username;
+	data.password.cstring = (char*)client->password;
 	return MQTTConnect(&client->mqttClient, &data);
 }
 

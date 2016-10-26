@@ -1,8 +1,8 @@
 /*
 The MIT License(MIT)
 
-Cayenne Arduino Client Library
-Copyright © 2016 myDevices
+Cayenne MQTT Client Library
+Copyright (c) 2016 myDevices
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files(the "Software"), to deal in the Software without restriction, including without limitation
@@ -18,6 +18,11 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #ifndef _CAYENNEMQTTCLIENT_h
 #define _CAYENNEMQTTCLIENT_h
 
+#include "MQTTClient.h"
+#include "../CayenneUtils/CayenneDefines.h"
+#include "../CayenneUtils/CayenneUtils.h"
+#include "../CayenneUtils/CayenneDataArray.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -32,11 +37,6 @@ extern "C" {
 #define DLLImport
 #define DLLExport
 #endif
-
-#include "MQTTClient.h"
-#include "../CayenneUtils/CayenneDefines.h"
-#include "../CayenneUtils/CayenneUtils.h"
-#include "../CayenneUtils/CayenneDataArray.h"
 
 	/**
 	* Cayenne message data passed to message handler functions.
@@ -57,9 +57,9 @@ extern "C" {
 	typedef struct CayenneMQTTClient
 	{
 		MQTTClient mqttClient;
-		char* username;
-		char* clientID;
-		char* password;
+		const char* username;
+		const char* password;
+		const char* clientID;
 		unsigned char sendbuf[CAYENNE_MAX_MESSAGE_SIZE + 1];
 		unsigned char readbuf[CAYENNE_MAX_MESSAGE_SIZE + 1];
 		struct CayenneMessageHandlers
@@ -74,14 +74,15 @@ extern "C" {
 	} CayenneMQTTClient;
 
 	/**
-	* Create an Cayenne MQTT client object.
+	* Create an Cayenne MQTT client object
 	* @param[out] client The initialized client object
+	* @param[out] network The network connection
 	* @param[in] username Cayenne username
+	* @param[in] password Cayenne password
 	* @param[in] clientID Cayennne client ID
-	* @param[in] password Password
 	* @param[in] defaultHandler Default MQTT message handler, can be NULL
 	*/
-	DLLExport void CayenneMQTTClientInit(CayenneMQTTClient* client, Network* network, char* username, char* clientID, char* password, CayenneMessageHandler defaultHandler);
+	DLLExport void CayenneMQTTClientInit(CayenneMQTTClient* client, Network* network, const char* username, const char* password, const char* clientID, CayenneMessageHandler defaultHandler);
 
 	/**
 	* Connect to the Cayenne server.
