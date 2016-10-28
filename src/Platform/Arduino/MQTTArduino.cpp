@@ -54,11 +54,11 @@ int TimerLeftMS(Timer* timer)
 }
 
 
-int arduino_read(Network* n, unsigned char* buffer, int len, int timeout_ms)
+int arduino_read(Network* network, unsigned char* buffer, int len, int timeout_ms)
 {
 	int interval = 10;  // all times are in milliseconds
 	int total = 0, rc = -1;
-	Client* client = static_cast<Client*>(n->client);
+	Client* client = static_cast<Client*>(network->client);
 
 	if (timeout_ms < 30)
 		interval = 2;
@@ -73,16 +73,16 @@ int arduino_read(Network* n, unsigned char* buffer, int len, int timeout_ms)
 }
 
 
-int arduino_write(Network* n, unsigned char* buffer, int len, int timeout_ms)
+int arduino_write(Network* network, unsigned char* buffer, int len, int timeout_ms)
 {
-	Client* client = static_cast<Client*>(n->client);
+	Client* client = static_cast<Client*>(network->client);
 	client->setTimeout(timeout_ms);
 
 	int index = 0;
 	int chunk = len;
 	while (index < len) {
-		if (n->chunkSize) {
-			chunk = (n->chunkSize < len - index) ? n->chunkSize : len - index;
+		if (network->chunkSize) {
+			chunk = (network->chunkSize < len - index) ? network->chunkSize : len - index;
 		}
 		int bytesWritten = client->write((uint8_t*)buffer + index, chunk);
 		if (bytesWritten == 0) {
@@ -94,31 +94,31 @@ int arduino_write(Network* n, unsigned char* buffer, int len, int timeout_ms)
 }
 
 
-void NetworkInit(Network* n, void* client, int chunkSize)
+void NetworkInit(Network* network, void* client, int chunkSize)
 {
-	n->client = client;
-	n->chunkSize = chunkSize;
-	n->mqttread = arduino_read;
-	n->mqttwrite = arduino_write;
+	network->client = client;
+	network->chunkSize = chunkSize;
+	network->mqttread = arduino_read;
+	network->mqttwrite = arduino_write;
 }
 
 
-int NetworkConnect(Network* n, char* addr, int port)
+int NetworkConnect(Network* network, char* addr, int port)
 {
-	Client* client = static_cast<Client*>(n->client);
+	Client* client = static_cast<Client*>(network->client);
 	return client->connect(addr, port);
 }
 
 
-void NetworkDisconnect(Network* n)
+void NetworkDisconnect(Network* network)
 {
-	Client* client = static_cast<Client*>(n->client);
+	Client* client = static_cast<Client*>(network->client);
 	client->stop();
 }
 
 
-int NetworkConnected(Network* n)
+int NetworkConnected(Network* network)
 {
-	Client* client = static_cast<Client*>(n->client);
+	Client* client = static_cast<Client*>(network->client);
 	return client->connected();
 }

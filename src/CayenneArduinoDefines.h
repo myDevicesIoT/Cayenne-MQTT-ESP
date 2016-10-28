@@ -102,6 +102,7 @@ Logging code adapted from Blynk library BlynkDebug.h. Copyright info below.
 					buffer[n] = 0;
 					CAYENNE_PRINT.print(buffer);
 					n = 0;
+					buffer[0] = 0;
 				}
 			}
 			if (c == 0) {
