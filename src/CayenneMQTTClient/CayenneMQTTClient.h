@@ -54,27 +54,34 @@ extern "C" {
 
 	typedef void(*CayenneMessageHandler)(CayenneMessageData*);
 
+	/**
+	* Cayenne MQTT client data.
+	*/
 	typedef struct CayenneMQTTClient
 	{
-		MQTTClient mqttClient;
-		const char* username;
-		const char* password;
-		const char* clientID;
-		unsigned char sendbuf[CAYENNE_MAX_MESSAGE_SIZE + 1];
-		unsigned char readbuf[CAYENNE_MAX_MESSAGE_SIZE + 1];
+		MQTTClient mqttClient; /**< MQTT client struct. */
+		const char* username; /**< Cayenne MQTT username. */
+		const char* password; /**< Cayenne MQTT pasword. */
+		const char* clientID; /**< Cayenne MQTT client ID. */
+		unsigned char sendbuf[CAYENNE_MAX_MESSAGE_SIZE + 1]; /**< Buffer used for sending data. */
+		unsigned char readbuf[CAYENNE_MAX_MESSAGE_SIZE + 1]; /**< Buffer used for receiving data. */
+
+		/**
+		* Cayenne custom message handler data.
+		*/
 		struct CayenneMessageHandlers
 		{
-			const char* clientID;
-			CayenneTopic topic;
-			unsigned int channel;
-			void(*fp) (CayenneMessageData*);
-		} messageHandlers[CAYENNE_MAX_MESSAGE_HANDLERS];      /* Message handlers are indexed by subscription topic */
+			const char* clientID; /**< Client ID of the message to handle. */
+			CayenneTopic topic; /**< Topic of the message to handle. */
+			unsigned int channel; /**< Channel of the message to handle. */
+			void(*fp) (CayenneMessageData*); /**< Custom message handler function. */
+		} messageHandlers[CAYENNE_MAX_MESSAGE_HANDLERS];  /**< Custom message handler array. */
 
-		void(*defaultMessageHandler) (CayenneMessageData*);
+		void(*defaultMessageHandler) (CayenneMessageData*); /**< Default message handler used if no custom handlers match the received message topic. */
 	} CayenneMQTTClient;
 
 	/**
-	* Create an Cayenne MQTT client object
+	* Create a Cayenne MQTT client object
 	* @param[out] client The initialized client object
 	* @param[out] network The network connection
 	* @param[in] username Cayenne username

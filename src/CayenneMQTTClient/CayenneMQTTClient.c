@@ -55,7 +55,7 @@ void MQTTMessageArrived(MessageData* md, void* userData)
 }
 
 /**
-* Create an Cayenne MQTT client object
+* Create a Cayenne MQTT client object
 * @param[out] client The initialized client object
 * @param[out] network The network connection
 * @param[in] username Cayenne username
