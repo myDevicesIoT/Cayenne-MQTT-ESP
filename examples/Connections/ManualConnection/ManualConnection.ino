@@ -34,6 +34,10 @@ void loop() {
 		lastMillis = millis();
 		//Write data to Cayenne here. This example just sends the current uptime in milliseconds.
 		Cayenne.virtualWrite(0, lastMillis);
+		//Some examples of other functions you can use to send data.
+		//Cayenne.celsiusWrite(0, 22.0);
+		//Cayenne.luxWrite(0, 700);
+		//Cayenne.relativeHumidityWrite(0, 50);
 	}
 }
 
