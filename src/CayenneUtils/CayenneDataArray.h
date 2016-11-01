@@ -289,7 +289,11 @@ namespace CayenneMQTT
 		*/
 		inline void add(const __FlashStringHelper* unit, const float value) {
 			char str[33];
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
 			dtostrf(value, 5, 3, str);
+#else
+			snprintf(str, 33, "%2.3f", value);
+#endif
 			add(unit, str);
 		}
 
@@ -300,7 +304,11 @@ namespace CayenneMQTT
 		*/
 		inline void add(const __FlashStringHelper* unit, const double value) {
 			char str[33];
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
 			dtostrf(value, 5, 3, str);
+#else
+			snprintf(str, 33, "%2.3f", value);
+#endif
 			add(unit, str);
 		}
 
