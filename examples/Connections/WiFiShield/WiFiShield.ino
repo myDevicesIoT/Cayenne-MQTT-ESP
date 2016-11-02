@@ -36,6 +36,6 @@ void loop() {
 
 CAYENNE_IN_DEFAULT()
 {
-	CAYENNE_LOG("CAYENNE_IN_DEFAULT(%u) - %s, %s", request.pin, getValue.getId(), getValue.asString());
+	CAYENNE_LOG("CAYENNE_IN_DEFAULT(%u) - %s, %s", request.channel, getValue.getId(), getValue.asString());
 	//Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
 }

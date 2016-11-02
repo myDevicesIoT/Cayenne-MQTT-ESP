@@ -21,7 +21,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #include "CayenneArduinoDefines.h"
 #include "CayenneMQTTClient/CayenneMQTTClient.h"
 
-const int MAX_PIN_ARRAY_SIZE = 4;
+const int MAX_CHANNEL_ARRAY_SIZE = 4;
 
 void CayenneMessageArrived(CayenneMessageData* message);
 
@@ -29,10 +29,10 @@ class CayenneArduinoMQTTClient
 {
 public:
 
-	static uint32_t virtualPins[MAX_PIN_ARRAY_SIZE];
+	static uint32_t virtualChannels[MAX_CHANNEL_ARRAY_SIZE];
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
-	static uint32_t digitalPins[MAX_PIN_ARRAY_SIZE];
-	static uint32_t analogPins[MAX_PIN_ARRAY_SIZE];
+	static uint32_t digitalChannels[MAX_CHANNEL_ARRAY_SIZE];
+	static uint32_t analogChannels[MAX_CHANNEL_ARRAY_SIZE];
 #endif
 
 	/**
@@ -81,10 +81,10 @@ public:
 	*/
 	void loop() {
 		CayenneMQTTYield(&_mqttClient, 1000);
-		pollPins(virtualPins);
+		pollChannels(virtualChannels);
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
-		pollPins(digitalPins);
-		pollPins(analogPins);
+		pollChannels(digitalChannels);
+		pollChannels(analogChannels);
 #endif
 		if (!NetworkConnected(&_network) || !CayenneMQTTConnected(&_mqttClient))
 		{
@@ -117,68 +117,68 @@ public:
 	}
 
 	/**
-	* Sends a measurement to a Virtual Pin
+	* Sends a measurement to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param data  Data to be sent
 	* @param type  Measurement type
 	* @param unit  Measurement unit
 	*/
 	template <typename T>
-	void virtualWrite(unsigned int pin, const T& data, const char* type = NULL, const char* unit = NULL)
+	void virtualWrite(unsigned int channel, const T& data, const char* type = NULL, const char* unit = NULL)
 	{
-		publishData(DATA_TOPIC, pin, data, type, unit);
+		publishData(DATA_TOPIC, channel, data, type, unit);
 	}
 
 	/**
-	* Sends a measurement to a Virtual Pin
+	* Sends a measurement to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param data  Data to be sent
 	* @param type  Measurement type
 	* @param unit  Measurement unit
 	*/
 	template <typename T>
-	void virtualWrite(unsigned int pin, const T& data, const __FlashStringHelper* type, const __FlashStringHelper* unit = NULL)
+	void virtualWrite(unsigned int channel, const T& data, const __FlashStringHelper* type, const __FlashStringHelper* unit = NULL)
 	{
-		publishData(DATA_TOPIC, pin, data, type, unit);
+		publishData(DATA_TOPIC, channel, data, type, unit);
 	}
 
 	/**
-	* Sends an array of measurements to a Virtual Pin
+	* Sends an array of measurements to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param values  Array of values to be sent
 	* @param type  Measurement type
 	*/
-	void virtualWrite(unsigned int pin, const CayenneValueArray& values, const char* type)
+	void virtualWrite(unsigned int channel, const CayenneValueArray& values, const char* type)
 	{
-		publishData(DATA_TOPIC, pin, values.getArray(), values.getCount(), type);
+		publishData(DATA_TOPIC, channel, values.getArray(), values.getCount(), type);
 	}
 
 	/**
-	* Sends an array of measurements to a Virtual Pin
+	* Sends an array of measurements to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param values  Array of values to be sent
 	* @param type  Measurement type
 	*/
-	void virtualWrite(unsigned int pin, const CayenneValueArray& values, const __FlashStringHelper* type)
+	void virtualWrite(unsigned int channel, const CayenneValueArray& values, const __FlashStringHelper* type)
 	{
-		publishData(DATA_TOPIC, pin, values.getArray(), values.getCount(), type);
+		publishData(DATA_TOPIC, channel, values.getArray(), values.getCount(), type);
 	}
 
 	/**
 	* Sends a response after processing a command
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param error  Error message, NULL for success
 	* @param id  Message id
 	*/
-	static void responseWrite(unsigned int pin, const char* error, const char* id)
+	static void responseWrite(unsigned int channel, const char* error, const char* id)
 	{
-		CAYENNE_LOG_DEBUG("Send response: pin %u, %s %s", pin, id, error);
-		CayenneMQTTPublishResponse(&_mqttClient, NULL, pin, id, error);
+		CAYENNE_LOG_DEBUG("Send response: channel %u, %s %s", channel, id, error);
+		CayenneMQTTPublishResponse(&_mqttClient, NULL, channel, id, error);
 	}
 	
 	/**
@@ -196,80 +196,80 @@ public:
 	}
 
 	/**
-	* Sends a Celsius value to a Virtual Pin
+	* Sends a Celsius value to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param value  Value to be sent
 	*/
-	void celsiusWrite(unsigned int pin, float value)
+	void celsiusWrite(unsigned int channel, float value)
 	{
-		virtualWrite(pin, value, F(TEMPERATURE), F(CELSIUS));
+		virtualWrite(channel, value, F(TEMPERATURE), F(CELSIUS));
 	}
 
 	/**
-	* Sends a Fahrenheit value to a Virtual Pin
+	* Sends a Fahrenheit value to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param value  Value to be sent
 	*/
-	void fahrenheitWrite(unsigned int pin, float value)
+	void fahrenheitWrite(unsigned int channel, float value)
 	{
-		virtualWrite(pin, value, F(TEMPERATURE), F(FAHRENHEIT));
+		virtualWrite(channel, value, F(TEMPERATURE), F(FAHRENHEIT));
 	}
 
 	/**
-	* Sends a Kelvin value to a Virtual Pin
+	* Sends a Kelvin value to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param value  Value to be sent
 	*/
-	void kelvinWrite(unsigned int pin, float value)
+	void kelvinWrite(unsigned int channel, float value)
 	{
-		virtualWrite(pin, value, F(TEMPERATURE), F(KELVIN));
+		virtualWrite(channel, value, F(TEMPERATURE), F(KELVIN));
 	}
 
 	/**
-	* Sends a Lux value to a Virtual Pin
+	* Sends a Lux value to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param value  Value to be sent
 	*/
-	void luxWrite(unsigned int pin, float value)
+	void luxWrite(unsigned int channel, float value)
 	{
-		virtualWrite(pin, value, F(LUMINOSITY), F(LUX));
+		virtualWrite(channel, value, F(LUMINOSITY), F(LUX));
 	}
 
 	/**
-	* Sends a Pascal value to a Virtual Pin
+	* Sends a Pascal value to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param value  Value to be sent
 	*/
-	void pascalWrite(unsigned int pin, float value)
+	void pascalWrite(unsigned int channel, float value)
 	{
-		virtualWrite(pin, value, F(BAROMETRIC_PRESSURE), F(PASCAL));
+		virtualWrite(channel, value, F(BAROMETRIC_PRESSURE), F(PASCAL));
 	}
 
 	/**
-	* Sends a Hectopascal value to a Virtual Pin
+	* Sends a Hectopascal value to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param value  Value to be sent
 	*/
-	void hectoPascalWrite(unsigned int pin, float value)
+	void hectoPascalWrite(unsigned int channel, float value)
 	{
-		virtualWrite(pin, value, F(BAROMETRIC_PRESSURE), F(HECTOPASCAL));
+		virtualWrite(channel, value, F(BAROMETRIC_PRESSURE), F(HECTOPASCAL));
 	}
 
 	/**
-	* Sends a Relative Humidity value to a Virtual Pin
+	* Sends a Relative Humidity value to a Cayenne channel
 	*
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	* @param value  Value to be sent
 	*/
-	void relativeHumidityWrite(unsigned int pin, float value)
+	void relativeHumidityWrite(unsigned int channel, float value)
 	{
-		virtualWrite(pin, value, F(HUMIDITY), F(RELATIVE_HUMIDITY));
+		virtualWrite(channel, value, F(HUMIDITY), F(RELATIVE_HUMIDITY));
 	}
 
 	/**
@@ -281,36 +281,36 @@ public:
 	}
 
 	/**
-	* Requests App or Server to re-send current value of a Virtual Pin.
+	* Requests App or Server to re-send current value of a Cayenne channel.
 	* This will cause the user-defined CAYENNE_IN handler to be called.
-	* @param pin  Virtual Pin number
+	* @param channel  Cayenne channel number
 	*/
-	void syncVirtual(int pin)
+	void syncVirtual(int channel)
 	{
 		//Not implemented. This is not needed with MQTT since the broker keeps the last message so we don't need to request it.
 	}
 
 	/**
-	* Enables/disables polling for a pin.
+	* Enables/disables polling for a channel.
 	* @param topic Cayenne topic
-	* @param pinArray  Pin array to modify
-	* @param pin  Pin number
-	* @param enable  Enable or disable polling of pin
+	* @param channelArray  Channel array to modify
+	* @param channel  Channel number
+	* @param enable  Enable or disable polling of channel
 	*/
-	static void enablePin(uint32_t pinArray[], uint8_t pin, bool enable)
+	static void enableChannel(uint32_t channelArray[], uint8_t channel, bool enable)
 	{
-		uint8_t index = pin / 32;
-		if (index >= MAX_PIN_ARRAY_SIZE)
+		uint8_t index = channel / 32;
+		if (index >= MAX_CHANNEL_ARRAY_SIZE)
 			return;
 
-		uint8_t mod = pin % 32;
+		uint8_t mod = channel % 32;
 		if (enable) {
-			pinArray[index] |= ((uint32_t)1 << mod);
+			channelArray[index] |= ((uint32_t)1 << mod);
 		}
 		else {
-			pinArray[index] &= ~((uint32_t)1 << mod);
+			channelArray[index] &= ~((uint32_t)1 << mod);
 		}
-		CAYENNE_LOG_DEBUG("enablePin: %d, %d: %lX %lX %lX %lX", pin, (int)enable, pinArray[0], pinArray[1], pinArray[2], pinArray[3]);
+		CAYENNE_LOG_DEBUG("enableChannel: %d, %d: %lX %lX %lX %lX", channel, (int)enable, channelArray[0], channelArray[1], channelArray[2], channelArray[3]);
 	}
 
 private:
@@ -318,80 +318,80 @@ private:
 	/**
 	* Publish data using specified topic suffix
 	* @param topic Cayenne topic
-	* @param pin Virtual Pin number
+	* @param channel Cayenne channel number
 	* @param data Data to send
 	* @param key Optional key to use for a key=data pair
 	* @param subkey Optional subkey to use for a key,subkey=data pair
 	*/
 	template <typename T>
-	static void publishData(CayenneTopic topic, unsigned int pin, const T& data, const char* key = NULL, const char* subkey = NULL) {
+	static void publishData(CayenneTopic topic, unsigned int channel, const T& data, const char* key = NULL, const char* subkey = NULL) {
 		char buffer[64];
 		CayenneValueArray values(buffer, sizeof(buffer));
 		values.add(subkey, data);
-		publishData(topic, pin, values.getArray(), values.getCount(), key);
+		publishData(topic, channel, values.getArray(), values.getCount(), key);
 	}
 
 	/**
 	* Publish data using specified topic suffix
 	* @param topic Cayenne topic
-	* @param pin Virtual Pin number
+	* @param channel Cayenne channel number
 	* @param data Data to send
 	* @param key Optional key to use for a key=data pair
 	* @param subkey Optional subkey to use for a key,subkey=data pair
 	*/
 	template <typename T>
-	static void publishData(CayenneTopic topic, unsigned int pin, const T& data, const __FlashStringHelper* key, const __FlashStringHelper* subkey = NULL) {
+	static void publishData(CayenneTopic topic, unsigned int channel, const T& data, const __FlashStringHelper* key, const __FlashStringHelper* subkey = NULL) {
 		char buffer[64];
 		char keyBuffer[MAX_TYPE_LENGTH+1];
 		CayenneValueArray values(buffer, sizeof(buffer));
 		values.add(subkey, data);
 		CAYENNE_MEMCPY(keyBuffer, reinterpret_cast<const char *>(key), CAYENNE_STRLEN(reinterpret_cast<const char *>(key)) + 1);
-		publishData(topic, pin, values.getArray(), values.getCount(), keyBuffer);
+		publishData(topic, channel, values.getArray(), values.getCount(), keyBuffer);
 	}
 
 	/**
 	* Publish value array using specified topic suffix
 	* @param topic Cayenne topic
-	* @param pin Virtual Pin number
+	* @param channel Cayenne channel number
 	* @param values  Array of values to be sent
 	* @param valueCount  Count of values in array
 	* @param key Optional key to use for a key=data pair
 	*/
-	static void publishData(CayenneTopic topic, unsigned int pin, const CayenneValuePair values[], size_t valueCount, const char* key) {
-		CAYENNE_LOG_DEBUG("Publish: topic %d, pin %u, value %s, subkey %s, key %s", topic, pin, values[0].value, values[0].unit, key);
-		CayenneMQTTPublishDataArray(&_mqttClient, NULL, topic, pin, key, values, valueCount);
+	static void publishData(CayenneTopic topic, unsigned int channel, const CayenneValuePair values[], size_t valueCount, const char* key) {
+		CAYENNE_LOG_DEBUG("Publish: topic %d, channel %u, value %s, subkey %s, key %s", topic, channel, values[0].value, values[0].unit, key);
+		CayenneMQTTPublishDataArray(&_mqttClient, NULL, topic, channel, key, values, valueCount);
 	}
 
 	/**
 	* Publish value array using specified topic suffix
 	* @param topic Cayenne topic
-	* @param pin Virtual Pin number
+	* @param channel Cayenne channel number
 	* @param values  Array of values to be sent
 	* @param valueCount  Count of values in array
 	* @param key Optional key to use for a key=data pair
 	*/
-	static void publishData(CayenneTopic topic, unsigned int pin, const CayenneValuePair values[], size_t valueCount, const __FlashStringHelper* key) {
+	static void publishData(CayenneTopic topic, unsigned int channel, const CayenneValuePair values[], size_t valueCount, const __FlashStringHelper* key) {
 		char keyBuffer[MAX_TYPE_LENGTH + 1];
 		CAYENNE_MEMCPY(keyBuffer, reinterpret_cast<const char *>(key), CAYENNE_STRLEN(reinterpret_cast<const char *>(key)) + 1);
-		CAYENNE_LOG_DEBUG("Publish: topic %d, pin %u, value %s, subkey %s, key %s", topic, pin, values[0].value, values[0].unit, keyBuffer);
-		CayenneMQTTPublishDataArray(&_mqttClient, NULL, topic, pin, keyBuffer, values, valueCount);
+		CAYENNE_LOG_DEBUG("Publish: topic %d, channel %u, value %s, subkey %s, key %s", topic, channel, values[0].value, values[0].unit, keyBuffer);
+		CayenneMQTTPublishDataArray(&_mqttClient, NULL, topic, channel, keyBuffer, values, valueCount);
 	}
 
 	/**
-	* Polls enabled digital pins and sends current value.
+	* Polls enabled digital channels and sends the matching pin's current value.
 	*/
-	void pollPins(uint32_t pinArray[])
+	void pollChannels(uint32_t channelArray[])
 	{
-		for (size_t index = 0; index < MAX_PIN_ARRAY_SIZE; ++index) {
-			if (pinArray[index]) {
+		for (size_t index = 0; index < MAX_CHANNEL_ARRAY_SIZE; ++index) {
+			if (channelArray[index]) {
 				for (size_t flag = 0; flag < 32; ++flag) {
-					if (pinArray[index] & ((uint32_t)1 << flag)) {
-						unsigned int pin = flag + (index * 32);
-						if (pinArray == virtualPins)
+					if (channelArray[index] & ((uint32_t)1 << flag)) {
+						unsigned int channel = flag + (index * 32);
+						if (channelArray == virtualChannels)
 						{
-							CAYENNE_LOG_DEBUG("Send virtual pin %d", pin);
-							Request request = { pin };
-							OutputHandlerFunction handler = GetOutputHandler(request.pin);
+							CAYENNE_LOG_DEBUG("Send channel %d", channel);
+							Request request = { channel };
+							OutputHandlerFunction handler = GetOutputHandler(request.channel);
 							if (handler && handler != OutputHandler) {
 								handler(request);
 							}
@@ -400,15 +400,15 @@ private:
 							}
 						}
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
-						else if (pinArray == digitalPins)
+						else if (channelArray == digitalChannels)
 						{
-							CAYENNE_LOG_DEBUG("Send digital pin %d %d", pin, digitalRead(pin));
-							publishData(DIGITAL_TOPIC, pin, digitalRead(pin));
+							CAYENNE_LOG_DEBUG("Send digital channel %d %d", channel, digitalRead(channel));
+							publishData(DIGITAL_TOPIC, channel, digitalRead(channel));
 						}
-						else if (pinArray == analogPins)
+						else if (channelArray == analogChannels)
 						{
-							CAYENNE_LOG_DEBUG("Send analog pin %d %d", pin, analogRead(pin));
-							publishData(ANALOG_TOPIC, pin, analogRead(pin));
+							CAYENNE_LOG_DEBUG("Send analog channel %d %d", channel, analogRead(channel));
+							publishData(ANALOG_TOPIC, channel, analogRead(channel));
 						}
 #endif
 					}
@@ -422,14 +422,14 @@ private:
 };
 
 CayenneMQTTClient CayenneArduinoMQTTClient::_mqttClient;
-uint32_t CayenneArduinoMQTTClient::virtualPins[MAX_PIN_ARRAY_SIZE] = { 0 };
+uint32_t CayenneArduinoMQTTClient::virtualChannels[MAX_CHANNEL_ARRAY_SIZE] = { 0 };
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
-uint32_t CayenneArduinoMQTTClient::digitalPins[MAX_PIN_ARRAY_SIZE] = { 0 };
-uint32_t CayenneArduinoMQTTClient::analogPins[MAX_PIN_ARRAY_SIZE] = { 0 };
+uint32_t CayenneArduinoMQTTClient::digitalChannels[MAX_CHANNEL_ARRAY_SIZE] = { 0 };
+uint32_t CayenneArduinoMQTTClient::analogChannels[MAX_CHANNEL_ARRAY_SIZE] = { 0 };
 #endif
 
-void configPin(uint32_t pinArray[], uint8_t pin, const char* bytes) {
-	CAYENNE_LOG_DEBUG("configPin: %d %s", pin, bytes);
+void configChannel(uint32_t channelArray[], uint8_t channel, const char* bytes) {
+	CAYENNE_LOG_DEBUG("configChannel: %d %s", channel, bytes);
 	int enable = -1;
 	if(strlen(bytes) >= 2) {
 		if (strcmp(bytes, "on") == 0) {
@@ -439,7 +439,7 @@ void configPin(uint32_t pinArray[], uint8_t pin, const char* bytes) {
 			enable = false;
 		}
 		if (enable != -1) {
-			CayenneArduinoMQTTClient::enablePin(pinArray, pin, enable);
+			CayenneArduinoMQTTClient::enableChannel(channelArray, channel, enable);
 		}
 	}
 }
@@ -449,8 +449,8 @@ void handleMessage(CayenneMessageData* messageData) {
 	const char* response = NULL;
 	CayenneMessage message(messageData);
 	if (strlen(messageData->values[0].value)) {
-		CAYENNE_LOG_DEBUG("In: value %s, pin %d", messageData->values[0].value, request.pin);
-		InputHandlerFunction handler = GetInputHandler(request.pin);
+		CAYENNE_LOG_DEBUG("In: value %s, channel %d", messageData->values[0].value, request.channel);
+		InputHandlerFunction handler = GetInputHandler(request.channel);
 		if (handler && handler != InputHandler) {
 			handler(request, message);
 		} else {
@@ -474,7 +474,7 @@ void handleAnalogMessage(CayenneMessageData* messageData) {
 	char* response = NULL;
 	if (value >= 0 && value <= 1) {
 		double test = value * 255;
-		CAYENNE_LOG_DEBUG("aw %f, pin %d", value, messageData->channel);
+		CAYENNE_LOG_DEBUG("aw %f, channel %d", value, messageData->channel);
 		analogWrite(messageData->channel, (int)(value * 255));
 		CayenneArduinoMQTTClient::publishState(ANALOG_TOPIC, messageData->channel, value);
 	}
@@ -487,7 +487,7 @@ void handleAnalogMessage(CayenneMessageData* messageData) {
 void handleDigitalMessage(CayenneMessageData* messageData) {
 	char* response = NULL;
 	if (messageData->values[0].value && strlen(messageData->values[0].value) == 1) {
-		CAYENNE_LOG_DEBUG("dw %s, pin %d", messageData->values[0].value, messageData->channel);
+		CAYENNE_LOG_DEBUG("dw %s, channel %d", messageData->values[0].value, messageData->channel);
 		if (messageData->values[0].value[0] == '0') {
 			digitalWrite(messageData->channel, LOW);
 			CayenneArduinoMQTTClient::publishState(DIGITAL_TOPIC, messageData->channel, LOW);
@@ -508,27 +508,27 @@ void handleDigitalMessage(CayenneMessageData* messageData) {
 #endif
 
 void CayenneMessageArrived(CayenneMessageData* message) {
-	CAYENNE_LOG_DEBUG("Message received: topic %d, pin %d", message->topic, message->channel);
+	CAYENNE_LOG_DEBUG("Message received: topic %d, channel %d", message->topic, message->channel);
 	switch (message->topic)
 	{
 	case COMMAND_TOPIC:
 		handleMessage(message);
 		break;
 	case CONFIG_TOPIC:
-		configPin(CayenneArduinoMQTTClient::virtualPins, message->channel, message->values[0].value);
+		configChannel(CayenneArduinoMQTTClient::virtualChannels, message->channel, message->values[0].value);
 		break;
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 	case DIGITAL_COMMAND_TOPIC:
 		handleDigitalMessage(message);
 		break;
 	case DIGITAL_CONFIG_TOPIC:
-		configPin(CayenneArduinoMQTTClient::digitalPins, message->channel, message->values[0].value);
+		configChannel(CayenneArduinoMQTTClient::digitalChannels, message->channel, message->values[0].value);
 		break;
 	case ANALOG_COMMAND_TOPIC:
 		handleAnalogMessage(message);
 		break;
 	case ANALOG_CONFIG_TOPIC:
-		configPin(CayenneArduinoMQTTClient::analogPins, message->channel, message->values[0].value);
+		configChannel(CayenneArduinoMQTTClient::analogChannels, message->channel, message->values[0].value);
 		break;
 #endif
 	default:

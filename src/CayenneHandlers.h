@@ -22,7 +22,7 @@ Code adapted from Blynk library BlynkHandlers.h. Copyright info below.
 * @license    This project is released under the MIT License (MIT)
 * @copyright  Copyright (c) 2015 Volodymyr Shymanskyy
 * @date       Jan 2015
-* @brief      Handlers for virtual pin operations
+* @brief      Handlers for virtual channel operations
 */
 
 #ifndef _CAYENNEHANDLERS_h
@@ -65,8 +65,8 @@ Code adapted from Blynk library BlynkHandlers.h. Copyright info below.
 #define V31 31
 
 //Input & Output handlers
-#define CAYENNE_IN(pin) void InputHandler ## pin (Request& request, CayenneMessage& getValue)
-#define CAYENNE_OUT(pin) void OutputHandler ## pin  (Request& request)
+#define CAYENNE_IN(channel) void InputHandler ## channel (Request& request, CayenneMessage& getValue)
+#define CAYENNE_OUT(channel) void OutputHandler ## channel  (Request& request)
 
 #define CAYENNE_IN_DEFAULT()   CAYENNE_IN(Default)
 #define CAYENNE_OUT_DEFAULT()  CAYENNE_OUT(Default)
@@ -83,21 +83,21 @@ extern "C" {
 
 struct Request
 {
-	unsigned int pin;
+	unsigned int channel;
 };
 
 typedef void (*InputHandlerFunction)(Request& request, CayenneMessage& getValue);
 typedef void(*OutputHandlerFunction)(Request& request);
 
-InputHandlerFunction GetInputHandler(uint8_t pin);
-OutputHandlerFunction GetOutputHandler(uint8_t pin);
+InputHandlerFunction GetInputHandler(uint8_t channel);
+OutputHandlerFunction GetOutputHandler(uint8_t channel);
 
 // Declare placeholders
 CAYENNE_OUT();
 CAYENNE_IN();
 void EmptyHandler();
 
-// Declare all pin handlers (you can redefine them in your code)
+// Declare all channel handlers (you can redefine them in your code)
 CAYENNE_CONNECTED();
 CAYENNE_DISCONNECTED();
 

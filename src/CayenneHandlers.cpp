@@ -22,28 +22,28 @@ Code adapted from Blynk library BlynkHandlers.cpp. Copyright info below.
  * @license    This project is released under the MIT License (MIT)
  * @copyright  Copyright (c) 2015 Volodymyr Shymanskyy
  * @date       Jan 2015
- * @brief      Virtual pin utilities
+ * @brief      Virtual channel utilities
  */
 
 #include "CayenneArduinoDefines.h"
 
 void InputHandler(Request& request, CayenneMessage& getValue)
 {
-	CAYENNE_LOG("No handler for writing to pin %d", request.pin);
+	CAYENNE_LOG("No handler for writing to channel %d", request.channel);
 }
 
 void OutputHandler(Request& request)
 {
-	CAYENNE_LOG("No handler for reading from pin %d", request.pin);
+	CAYENNE_LOG("No handler for reading from channel %d", request.channel);
 }
 
 void EmptyHandler()
 {}
 
-#define CAYENNE_IN_IMPL(pin) void InputHandler ## pin (Request& req, CayenneMessage& getValue) \
+#define CAYENNE_IN_IMPL(channel) void InputHandler ## channel (Request& req, CayenneMessage& getValue) \
           __attribute__((weak, alias("InputHandler")))
 
-#define CAYENNE_OUT_IMPL(pin)  void OutputHandler ## pin (Request& req) \
+#define CAYENNE_OUT_IMPL(channel)  void OutputHandler ## channel (Request& req) \
           __attribute__((weak, alias("OutputHandler")))
 
 
@@ -142,24 +142,24 @@ static const OutputHandlerFunction OutputHandlerVector[MAX_NUM_OF_CHANNELS] CAYE
 };
 
 
-InputHandlerFunction GetInputHandler(uint8_t pin)
+InputHandlerFunction GetInputHandler(uint8_t channel)
 {
-	if (pin >= COUNT_OF(InputHandlerVector))
+	if (channel >= COUNT_OF(InputHandlerVector))
 		return NULL;
 #ifdef CAYENNE_USING_PROGMEM
-	return (InputHandlerFunction)pgm_read_word(&InputHandlerVector[pin]);
+	return (InputHandlerFunction)pgm_read_word(&InputHandlerVector[channel]);
 #else
-	return InputHandlerVector[pin];
+	return InputHandlerVector[channel];
 #endif
 }
 
-OutputHandlerFunction GetOutputHandler(uint8_t pin)
+OutputHandlerFunction GetOutputHandler(uint8_t channel)
 {
-	if (pin >= COUNT_OF(OutputHandlerVector))
+	if (channel >= COUNT_OF(OutputHandlerVector))
 		return NULL;
 #ifdef CAYENNE_USING_PROGMEM
-	return (OutputHandlerFunction)pgm_read_word(&OutputHandlerVector[pin]);
+	return (OutputHandlerFunction)pgm_read_word(&OutputHandlerVector[channel]);
 #else
-	return OutputHandlerVector[pin];
+	return OutputHandlerVector[channel];
 #endif
 }
