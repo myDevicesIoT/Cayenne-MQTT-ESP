@@ -338,8 +338,8 @@ int CayenneBuildDataPayload(char* payload, size_t* length, const char* type, con
 			payloadLength += strlen(values[i].unit) + 1;
 		}
 		else if (type) {
-			// If type exists but unit does not, use UNDEFINED for the unit.
-			payloadLength += strlen(UNDEFINED) + 1;
+			// If type exists but unit does not, use UNIT_UNDEFINED for the unit.
+			payloadLength += strlen(UNIT_UNDEFINED) + 1;
 		}
 		payloadLength += values[i].value ? strlen(values[i].value) + 1 : 0;
 	}
@@ -359,7 +359,7 @@ int CayenneBuildDataPayload(char* payload, size_t* length, const char* type, con
 		if (values[i].unit)
 			strcat(payload, values[i].unit);
 		else if (type)
-			strcat(payload, UNDEFINED);
+			strcat(payload, UNIT_UNDEFINED);
 	}
 	if (payload[0] != '\0' && valueCount > 0 && values[0].value)
 		strcat(payload, "=");

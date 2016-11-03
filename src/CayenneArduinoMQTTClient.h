@@ -203,7 +203,7 @@ public:
 	*/
 	void celsiusWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TEMPERATURE), F(CELSIUS));
+		virtualWrite(channel, value, F(TYPE_TEMPERATURE), F(UNIT_CELSIUS));
 	}
 
 	/**
@@ -214,7 +214,7 @@ public:
 	*/
 	void fahrenheitWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TEMPERATURE), F(FAHRENHEIT));
+		virtualWrite(channel, value, F(TYPE_TEMPERATURE), F(UNIT_FAHRENHEIT));
 	}
 
 	/**
@@ -225,7 +225,7 @@ public:
 	*/
 	void kelvinWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TEMPERATURE), F(KELVIN));
+		virtualWrite(channel, value, F(TYPE_TEMPERATURE), F(UNIT_KELVIN));
 	}
 
 	/**
@@ -236,7 +236,7 @@ public:
 	*/
 	void luxWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(LUMINOSITY), F(LUX));
+		virtualWrite(channel, value, F(TYPE_LUMINOSITY), F(UNIT_LUX));
 	}
 
 	/**
@@ -247,7 +247,7 @@ public:
 	*/
 	void pascalWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(BAROMETRIC_PRESSURE), F(PASCAL));
+		virtualWrite(channel, value, F(TYPE_BAROMETRIC_PRESSURE), F(UNIT_PASCAL));
 	}
 
 	/**
@@ -258,18 +258,7 @@ public:
 	*/
 	void hectoPascalWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(BAROMETRIC_PRESSURE), F(HECTOPASCAL));
-	}
-
-	/**
-	* Sends a Relative Humidity value to a Cayenne channel
-	*
-	* @param channel  Cayenne channel number
-	* @param value  Value to be sent
-	*/
-	void relativeHumidityWrite(unsigned int channel, float value)
-	{
-		virtualWrite(channel, value, F(HUMIDITY), F(RELATIVE_HUMIDITY));
+		virtualWrite(channel, value, F(TYPE_BAROMETRIC_PRESSURE), F(UNIT_HECTOPASCAL));
 	}
 
 	/**

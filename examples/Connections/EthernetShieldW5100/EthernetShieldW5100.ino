@@ -26,10 +26,11 @@ void loop() {
 		//Some examples of other functions you can use to send data.
 		//Cayenne.celsiusWrite(1, 22.0);
 		//Cayenne.luxWrite(2, 700);
-		//Cayenne.relativeHumidityWrite(3, 50);
+		//Cayenne.virtualWrite(3, 50, TYPE_PROXIMITY, UNIT_CENTIMETER);
 	}
 }
 
+//Default function for processing channel messages.
 CAYENNE_IN_DEFAULT()
 {
 	CAYENNE_LOG("CAYENNE_IN_DEFAULT(%u) - %s, %s", request.channel, getValue.getId(), getValue.asString());
