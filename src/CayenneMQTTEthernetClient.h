@@ -22,6 +22,9 @@ This software uses open source arduino-mqtt library - see MQTTClient-LICENSE.md
 
 #include "CayenneArduinoMQTTClient.h"
 
+static const uint32_t HASH_PRIME = 0x01000193; //   16777619 - Default prime value recommended for fnv hash
+static const uint32_t HASH_SEED = 0x811C9DC5;  // 2166136261 - Default seed value recommended for fnv hash
+
 class CayenneMQTTEthernetClient : public CayenneArduinoMQTTClient
 {
 public:
@@ -92,26 +95,23 @@ private:
 			return mac;
 
 		_mac[0] = 0xFE;
-		if (strnlen(token, 10) != 10)
-		{
-			CAYENNE_LOG("Using default MAC");
-			_mac[1] = 0xED;
-			_mac[2] = 0xBA;
-			_mac[3] = 0xFE;
-			_mac[4] = 0xFE;
-			_mac[5] = 0xED;
-		}
-		else
-		{
-			//Generate MAC from token to prevent collisions on the same network.
-			_mac[1] = token[0] + token[1];
-			_mac[2] = token[2] + token[3];
-			_mac[3] = token[4] + token[5];
-			_mac[4] = token[6] + token[7];
-			_mac[5] = token[8] + token[9];
-		}
+		//Generate MAC from token to prevent collisions on the same network.
+		_mac[1] = token[0] ? token[0] : 0xED;
+		*((uint32_t*)&_mac[2]) = fnv1a(token);
 		CAYENNE_LOG("MAC: %X-%X-%X-%X-%X-%X", _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]);
 		return _mac;
+	}
+
+	/**
+	* Create hash value using FNV-1a algorithm.
+	* @param text Null terminated string to generate hash from
+	* @returns hash Seed value for hash
+	*/
+	uint32_t fnv1a(const char* text, uint32_t hash = HASH_SEED)
+	{
+		while (*text)
+			hash = (*text++ ^ hash) * HASH_PRIME;
+		return hash;
 	}
 
 	EthernetClient _ethernetClient;
