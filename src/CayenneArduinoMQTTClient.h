@@ -177,7 +177,7 @@ public:
 	*/
 	static void responseWrite(const char* error, const char* id)
 	{
-		CAYENNE_LOG_DEBUG("Send response: channel %u, %s %s", channel, id, error);
+		CAYENNE_LOG_DEBUG("Send response: %s %s", id, error);
 		CayenneMQTTPublishResponse(&_mqttClient, NULL, id, error);
 	}
 	
