@@ -291,15 +291,14 @@ int CayenneMQTTPublishDataArray(CayenneMQTTClient* client, const char* clientID,
 * Send a response to a channel.
 * @param[in] client The client object
 * @param[in] clientID The client ID to use in the topic, NULL to use the clientID the client was initialized with
-* @param[in] channel The channel to send response to
 * @param[in] id ID of message the response is for
 * @param[in] error Optional error message, NULL for success
 * @return success code
 */
-int CayenneMQTTPublishResponse(CayenneMQTTClient* client, const char* clientID, unsigned int channel, const char* id, const char* error)
+int CayenneMQTTPublishResponse(CayenneMQTTClient* client, const char* clientID, const char* id, const char* error)
 {
 	char buffer[CAYENNE_MAX_MESSAGE_SIZE + 1] = { 0 };
-	int result = CayenneBuildTopic(buffer, sizeof(buffer), client->username, clientID ? clientID : client->clientID, RESPONSE_TOPIC, channel);
+	int result = CayenneBuildTopic(buffer, sizeof(buffer), client->username, clientID ? clientID : client->clientID, RESPONSE_TOPIC, CAYENNE_NO_CHANNEL);
 	if (result == CAYENNE_SUCCESS) {
 		size_t size = strlen(buffer);
 		char* payload = &buffer[size + 1];

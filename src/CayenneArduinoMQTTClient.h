@@ -175,10 +175,10 @@ public:
 	* @param error  Error message, NULL for success
 	* @param id  Message id
 	*/
-	static void responseWrite(unsigned int channel, const char* error, const char* id)
+	static void responseWrite(const char* error, const char* id)
 	{
 		CAYENNE_LOG_DEBUG("Send response: channel %u, %s %s", channel, id, error);
-		CayenneMQTTPublishResponse(&_mqttClient, NULL, channel, id, error);
+		CayenneMQTTPublishResponse(&_mqttClient, NULL, id, error);
 	}
 	
 	/**
@@ -331,7 +331,7 @@ private:
 	template <typename T>
 	static void publishData(CayenneTopic topic, unsigned int channel, const T& data, const __FlashStringHelper* key, const __FlashStringHelper* subkey = NULL) {
 		char buffer[64];
-		char keyBuffer[MAX_TYPE_LENGTH+1];
+		char keyBuffer[MAX_TYPE_LENGTH + 1];
 		CayenneValueArray values(buffer, sizeof(buffer));
 		values.add(subkey, data);
 		CAYENNE_MEMCPY(keyBuffer, reinterpret_cast<const char *>(key), CAYENNE_STRLEN(reinterpret_cast<const char *>(key)) + 1);
@@ -454,7 +454,7 @@ void handleMessage(CayenneMessageData* messageData) {
 		// If there was no error, we send the new channel state, which should be the command value we received.
 		CayenneArduinoMQTTClient::publishState(DATA_TOPIC, messageData->channel, messageData->values[0].value);
 	}
-	CayenneArduinoMQTTClient::responseWrite(messageData->channel, response, messageData->id);
+	CayenneArduinoMQTTClient::responseWrite(response, messageData->id);
 }
 
 #ifdef DIGITAL_AND_ANALOG_SUPPORT

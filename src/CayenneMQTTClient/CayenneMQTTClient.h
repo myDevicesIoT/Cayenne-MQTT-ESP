@@ -206,12 +206,11 @@ extern "C" {
 	* Send a response to a channel.
 	* @param[in] client The client object
 	* @param[in] clientID The client ID to use in the topic, NULL to use the clientID the client was initialized with
-	* @param[in] channel The channel to send response to
 	* @param[in] id ID of message the response is for
 	* @param[in] error Optional error message, NULL for success
 	* @return success code
 	*/
-	DLLExport int CayenneMQTTPublishResponse(CayenneMQTTClient* client, const char* clientID, unsigned int channel, const char* id, const char* error);
+	DLLExport int CayenneMQTTPublishResponse(CayenneMQTTClient* client, const char* clientID, const char* id, const char* error);
 
 	/**
 	* Subscribe to a topic.
