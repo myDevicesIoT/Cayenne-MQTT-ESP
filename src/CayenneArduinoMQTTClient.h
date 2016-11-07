@@ -54,15 +54,20 @@ public:
 	*/
 	void connect() {
 		CAYENNE_LOG("Connecting to %s:%d", CAYENNE_DOMAIN, CAYENNE_PORT);
-		while (!NetworkConnect(&_network, CAYENNE_DOMAIN, CAYENNE_PORT)) {
-			CAYENNE_LOG("Network connect failed");
-			delay(1000);
+		int error = MQTT_FAILURE;
+		do {
+			if (!NetworkConnect(&_network, CAYENNE_DOMAIN, CAYENNE_PORT)) {
+				CAYENNE_LOG("Network connect failed");
+				delay(1000);
+			}
+			else if ((error = CayenneMQTTConnect(&_mqttClient)) != MQTT_SUCCESS) {
+				CAYENNE_LOG("MQTT connect failed, error %d", error);
+				NetworkDisconnect(&_network);
+				delay(1000);
+			}
 		}
-		int error = MQTT_SUCCESS;
-		while ((error = CayenneMQTTConnect(&_mqttClient)) != MQTT_SUCCESS) {
-			CAYENNE_LOG("MQTT connect failed, error %d", error);
-			delay(1000);
-		}
+		while (error != MQTT_SUCCESS);
+
 		CAYENNE_LOG("Connected");
 		CayenneConnected();
 		CayenneMQTTSubscribe(&_mqttClient, NULL, COMMAND_TOPIC, CAYENNE_ALL_CHANNELS, NULL);
