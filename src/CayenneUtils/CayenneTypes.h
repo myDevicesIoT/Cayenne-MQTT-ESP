@@ -19,12 +19,11 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define _CAYENNETYPES_h
 
 // Data types
-#define TYPE_ABSOLUTE_HUMIDITY "abs_hum" // Absolute Humidity
 #define TYPE_BATTERY "batt" // Battery
 #define TYPE_LUMINOSITY "lum" // Luminosity
 #define TYPE_BAROMETRIC_PRESSURE "bp" // Barometric pressure
-#define TYPE_PRESSURE "press" // Pressure
 #define TYPE_PROXIMITY "prox" // Proximity
+#define TYPE_RELATIVE_HUMIDITY "rel_hum" // Relative Humidity
 #define TYPE_TEMPERATURE "temp" // Temperature
 #define TYPE_VOLTAGE "voltage" // Voltage
 
