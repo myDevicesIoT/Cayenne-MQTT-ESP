@@ -58,6 +58,7 @@ int arduino_read(Network* network, unsigned char* buffer, int len, int timeout_m
 {
 	int interval = 10;  // all times are in milliseconds
 	int total = 0, rc = -1;
+	int bytesRead = 0;
 	Client* client = static_cast<Client*>(network->client);
 
 	if (timeout_ms < 30)
@@ -69,6 +70,12 @@ int arduino_read(Network* network, unsigned char* buffer, int len, int timeout_m
 	}
 	if (client->available() >= len)
 		rc = client->readBytes((char*)buffer, len);
+	else {
+		while (client->available() && bytesRead < len)
+		{
+			rc = bytesRead += client->readBytes((char*)buffer + bytesRead, len - bytesRead);
+		}
+	}
 	return rc;
 }
 
