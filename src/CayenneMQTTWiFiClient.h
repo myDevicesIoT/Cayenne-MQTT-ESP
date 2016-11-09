@@ -32,7 +32,6 @@ class CayenneMQTTWiFiClient : public CayenneArduinoMQTTClient
 public:
 	/**
 	* Begins Cayenne session
-	* @param token Authentication token from Cayenne site
 	* @param username Cayenne username
 	* @param password Cayenne password
 	* @param clientID Cayennne client ID
@@ -59,7 +58,7 @@ public:
 			CAYENNE_LOG("Connnection failed, retrying");
 		}
 		IPAddress local_ip = WiFi.localIP();
-		CAYENNE_LOG("Local IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
+		CAYENNE_LOG("IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
 		CayenneArduinoMQTTClient::begin(_wifiClient, username, password, clientID, WRITE_CHUNK_SIZE);
 	}
 
