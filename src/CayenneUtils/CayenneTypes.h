@@ -19,32 +19,32 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define _CAYENNETYPES_h
 
 // Data types
+#define TYPE_BAROMETRIC_PRESSURE "bp" // Barometric pressure
 #define TYPE_BATTERY "batt" // Battery
 #define TYPE_LUMINOSITY "lum" // Luminosity
-#define TYPE_BAROMETRIC_PRESSURE "bp" // Barometric pressure
 #define TYPE_PROXIMITY "prox" // Proximity
 #define TYPE_RELATIVE_HUMIDITY "rel_hum" // Relative Humidity
 #define TYPE_TEMPERATURE "temp" // Temperature
 #define TYPE_VOLTAGE "voltage" // Voltage
 
-#define MAX_TYPE_LENGTH 8
+#define MAX_TYPE_LENGTH 7
 
-// Measurement units
+// Unit types
 #define UNIT_UNDEFINED "null"
+#define UNIT_PASCAL "pa" // Pascal
+#define UNIT_HECTOPASCAL "hpa" // Hectopascal
 #define UNIT_PERCENT "p" // % (0 to 100)
 #define UNIT_RATIO "r" // Ratio
 #define UNIT_VOLTS "v" // Volts
-#define UNIT_MILLIVOLTS "v" // Millivolts
 #define UNIT_LUX "lux" // Lux
-#define UNIT_PASCAL "pa" // Pascal
-#define UNIT_HECTOPASCAL "hpa" // Hectopascal
-#define UNIT_MILLIMETER "mm" // Millimeter
 #define UNIT_CENTIMETER "cm" // Centimeter
 #define UNIT_METER "m" // Meter
+#define UNIT_DIGITAL "d" // Digital (0/1)
 #define UNIT_FAHRENHEIT "f" // Fahrenheit
 #define UNIT_CELSIUS "c" // Celsius
 #define UNIT_KELVIN "k" // Kelvin
+#define UNIT_MILLIVOLTS "mv" // Millivolts
 
-#define MAX_UNIT_LENGTH 8
+#define MAX_UNIT_LENGTH 4
 
 #endif
