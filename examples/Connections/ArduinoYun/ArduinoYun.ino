@@ -30,6 +30,8 @@ void loop() {
 	}
 }
 
+//Default function for processing actuator commands from the Cayenne Dashboard.
+//You can also use functions for specific channels, e.g CAYENNE_IN(1) for channel 1 commands.
 CAYENNE_IN_DEFAULT()
 {
 	CAYENNE_LOG("CAYENNE_IN_DEFAULT(%u) - %s, %s", request.channel, getValue.getId(), getValue.asString());
