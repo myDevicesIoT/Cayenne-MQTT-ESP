@@ -27,7 +27,7 @@ void loop() {
 		//Some examples of other functions you can use to send data.
 		//Cayenne.celsiusWrite(1, 22.0);
 		//Cayenne.luxWrite(2, 700);
-		//Cayenne.relativeHumidityWrite(3, 50);
+		//Cayenne.virtualWrite(3, 50, TYPE_PROXIMITY, UNIT_CENTIMETER);
 	}
 }
 

@@ -35,6 +35,11 @@ public:
 	void begin(const char* username, const char* password, const char* clientID)
 	{
 		Bridge.begin();
+		CAYENNE_LOG("bridge begin");
+		Process p;
+		p.runShellCommand("wifi up");
+		while (p.running());
+		CAYENNE_LOG("wifi up");
 		CayenneArduinoMQTTClient::begin(_bridgeClient, username, password, clientID);
 	}
 
