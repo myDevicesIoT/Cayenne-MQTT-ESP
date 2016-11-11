@@ -19,6 +19,7 @@ void setup() {
 void loop() {
 	Cayenne.loop();
 
+	//Publish data every 10 seconds (10000 milliseconds). Change this value to publish at a different interval.
 	if (millis() - lastMillis > 10000) {
 		lastMillis = millis();
 		//Write data to Cayenne here. This example just sends the current uptime in milliseconds.
