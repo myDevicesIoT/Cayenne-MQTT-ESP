@@ -27,6 +27,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define CAYENNE_MAX_MESSAGE_SIZE 134 // Redefine this for different message size
 #endif
 
+#ifndef CAYENNE_MAX_PAYLOAD_SIZE
+#define CAYENNE_MAX_PAYLOAD_SIZE 64 // Redefine this for different message size
+#endif
+
 #ifndef CAYENNE_MAX_MESSAGE_HANDLERS
 #define CAYENNE_MAX_MESSAGE_HANDLERS 5 /* Redefine to change number of handlers */
 #endif

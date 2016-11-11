@@ -32,7 +32,7 @@ namespace CayenneMQTT
 	* @param BUFFER_SIZE Maximum buffer size to use for data array, in bytes.
 	* @param MAX_VALUES Maximum number of unit/value pairs in the array.
 	*/
-	template<int BUFFER_SIZE = CAYENNE_MAX_MESSAGE_SIZE, int MAX_VALUES = CAYENNE_MAX_MESSAGE_VALUES>
+	template<int BUFFER_SIZE = CAYENNE_MAX_PAYLOAD_SIZE, int MAX_VALUES = CAYENNE_MAX_MESSAGE_VALUES>
 	class DataArray
 	{
 	public:
@@ -325,7 +325,7 @@ namespace CayenneMQTT
 		* Get the number of items in the unit/value pair array.
 		* @return Count of items.
 		*/
-    	size_t getCount() const {
+    	const size_t getCount() const {
 			return _valueCount;
 		}
 

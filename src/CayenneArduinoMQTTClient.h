@@ -156,7 +156,7 @@ public:
 	* @param values  Array of values to be sent
 	* @param type  Measurement type
 	*/
-	void virtualWrite(unsigned int channel, const CayenneValueArray& values, const char* type)
+	void virtualWrite(unsigned int channel, const CayenneDataArray& values, const char* type)
 	{
 		publishData(DATA_TOPIC, channel, values.getArray(), values.getCount(), type);
 	}
@@ -168,7 +168,7 @@ public:
 	* @param values  Array of values to be sent
 	* @param type  Measurement type
 	*/
-	void virtualWrite(unsigned int channel, const CayenneValueArray& values, const __FlashStringHelper* type)
+	void virtualWrite(unsigned int channel, const CayenneDataArray& values, const __FlashStringHelper* type)
 	{
 		publishData(DATA_TOPIC, channel, values.getArray(), values.getCount(), type);
 	}
@@ -319,8 +319,7 @@ private:
 	*/
 	template <typename T>
 	static void publishData(CayenneTopic topic, unsigned int channel, const T& data, const char* key = NULL, const char* subkey = NULL) {
-		char buffer[64];
-		CayenneValueArray values(buffer, sizeof(buffer));
+		CayenneDataArray values;
 		values.add(subkey, data);
 		publishData(topic, channel, values.getArray(), values.getCount(), key);
 	}
@@ -335,9 +334,8 @@ private:
 	*/
 	template <typename T>
 	static void publishData(CayenneTopic topic, unsigned int channel, const T& data, const __FlashStringHelper* key, const __FlashStringHelper* subkey = NULL) {
-		char buffer[64];
 		char keyBuffer[MAX_TYPE_LENGTH + 1];
-		CayenneValueArray values(buffer, sizeof(buffer));
+		CayenneDataArray values;
 		values.add(subkey, data);
 		CAYENNE_MEMCPY(keyBuffer, reinterpret_cast<const char *>(key), CAYENNE_STRLEN(reinterpret_cast<const char *>(key)) + 1);
 		publishData(topic, channel, values.getArray(), values.getCount(), keyBuffer);
