@@ -2,7 +2,7 @@
 The MIT License(MIT)
 
 Cayenne Arduino Client Library
-Copyright © 2016 myDevices
+Copyright (c) 2016 myDevices
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files(the "Software"), to deal in the Software without restriction, including without limitation
@@ -45,16 +45,17 @@ public:
 		}
 
 		CAYENNE_LOG("Connecting to %s", ssid);
-		while (WL_CONNECTED != status) {
-			if (wifiPassword && strlen(wifiPassword)) {
-				status = WiFi.begin((char*)ssid, (char*)wifiPassword);
-			}
-			else {
-				status = WiFi.begin((char*)ssid);
-			}
-			delay(5000);
-			CAYENNE_LOG("Connnection failed, retrying");
+		if (wifiPassword && strlen(wifiPassword)) {
+			WiFi.begin(ssid, wifiPassword);
 		}
+		else {
+			WiFi.begin(ssid);
+		}
+		while (WiFi.status() != WL_CONNECTED) {
+			delay(500);
+		}
+		CAYENNE_LOG("Connected to WiFi");
+
 		IPAddress local_ip = WiFi.localIP();
 		CAYENNE_LOG("IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
 		CayenneArduinoMQTTClient::begin(_wifiClient, username, password, clientID, WRITE_CHUNK_SIZE);
