@@ -57,6 +57,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define CAYENNE_STRNCMP(s1, s2, n) strncmp_P(s1, s2, n)
 #define CAYENNE_MEMCPY(s1, s2, n) memcpy_P(s1, s2, n)
 #define CAYENNE_READ_BYTE(b) pgm_read_byte(b);
+#define CAYENNE_FLASH(s) F(s)
 #else
 #define CAYENNE_PROGMEM
 #define CAYENNE_PSTR(s) s
@@ -65,6 +66,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define CAYENNE_STRNCMP(s1, s2, n) strncmp(s1, s2, n)
 #define CAYENNE_MEMCPY(s1, s2, n) memcpy(s1, s2, n)
 #define CAYENNE_READ_BYTE(b) *b;
+#define CAYENNE_FLASH(s) s
 #endif
 
 #include "CayenneTypes.h"

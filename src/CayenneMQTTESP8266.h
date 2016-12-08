@@ -2,7 +2,7 @@
 The MIT License(MIT)
 
 Cayenne Arduino Client Library
-Copyright © 2016 myDevices
+Copyright (c) 2016 myDevices
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 documentation files(the "Software"), to deal in the Software without restriction, including without limitation 
@@ -15,11 +15,10 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER I
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _CAYENNEMQTTWIFI101_h
-#define _CAYENNEMQTTWIFI101_h
+#ifndef _CAYENNEMQTTESP8266_h
+#define _CAYENNEMQTTESP8266_h
 
-#include <SPI.h>
-#include <WiFi101.h>
+#include <ESP8266WiFi.h>
 #include "CayenneUtils/CayenneDefines.h"
 #include "CayenneMQTTWiFiClient.h"
 

@@ -2,7 +2,7 @@
 The MIT License(MIT)
 
 Cayenne Arduino Client Library
-Copyright © 2016 myDevices
+Copyright (c) 2016 myDevices
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files(the "Software"), to deal in the Software without restriction, including without limitation
@@ -41,15 +41,21 @@ Logging code adapted from Blynk library BlynkDebug.h. Copyright info below.
 	#endif
 #endif
 
+// Added support for CC3200 LaunchPad and CC3100 BoosterPack for other LaunchPads
+// Rei Vilo, Nov. 30, 2016 â€” CC = BY SA NC
+#if defined(ENERGIA)
+#include "stdarg.h"
+#endif
+
 #ifdef CAYENNE_PRINT
-	static void log(const char* PROGMEM message, ...)
+	static void log(const char* CAYENNE_PROGMEM message, ...)
 	{
 		va_list args;
 		va_start(args, message);
 		char buffer[12];
 		CAYENNE_PRINT.print('[');
 		CAYENNE_PRINT.print(millis());
-		CAYENNE_PRINT.print(F("] "));
+		CAYENNE_PRINT.print(CAYENNE_FLASH("] "));
 		const char* p = message;
 		size_t n = 0;
 		while (1) {

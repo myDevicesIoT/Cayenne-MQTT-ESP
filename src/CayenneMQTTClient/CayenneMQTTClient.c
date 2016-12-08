@@ -177,7 +177,7 @@ int CayenneMQTTPublishDataUInt(CayenneMQTTClient* client, const char* clientID, 
 int CayenneMQTTPublishDataLong(CayenneMQTTClient* client, const char* clientID, CayenneTopic topic, unsigned int channel, const char* type, const char* unit, long value)
 {
 	char str[2 + 8 * sizeof(value)];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined(ENERGIA)
 	ltoa(value, str, 10);
 #else
 	snprintf(str, sizeof(str), "%ld", value);
@@ -200,7 +200,7 @@ int CayenneMQTTPublishDataLong(CayenneMQTTClient* client, const char* clientID, 
 int CayenneMQTTPublishDataULong(CayenneMQTTClient* client, const char* clientID, CayenneTopic topic, unsigned int channel, const char* type, const char* unit, unsigned long value)
 {
 	char str[1 + 8 * sizeof(value)];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined(ENERGIA)
 	ultoa(value, str, 10);
 #else
 	snprintf(str, sizeof(str), "%lu", value);
@@ -223,7 +223,7 @@ int CayenneMQTTPublishDataULong(CayenneMQTTClient* client, const char* clientID,
 int CayenneMQTTPublishDataDouble(CayenneMQTTClient* client, const char* clientID, CayenneTopic topic, unsigned int channel, const char* type, const char* unit, double value)
 {
 	char str[33];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined(ENERGIA)
 	dtostrf(value, 5, 3, str);
 #else
 	snprintf(str, 33, "%2.3f", value);
@@ -246,7 +246,7 @@ int CayenneMQTTPublishDataDouble(CayenneMQTTClient* client, const char* clientID
 int CayenneMQTTPublishDataFloat(CayenneMQTTClient* client, const char* clientID, CayenneTopic topic, unsigned int channel, const char* type, const char* unit, float value)
 {
 	char str[33];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined(ENERGIA)
 	dtostrf(value, 5, 3, str);
 #else
 	snprintf(str, 33, "%2.3f", value);

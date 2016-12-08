@@ -1,8 +1,13 @@
-// This example shows how to connect to Cayenne using an Arduino Yun and send/receive sample data.
+// This example shows how to connect to Cayenne using an ESP8266 and send/receive sample data.
+// Make sure you install the ESP8266 Board Package via the Arduino IDE Board Manager and select the correct ESP8266 board before compiling. 
 
 //#define CAYENNE_DEBUG
 #define CAYENNE_PRINT Serial
-#include <CayenneMQTTYun.h>
+#include <CayenneMQTTESP8266.h>
+
+// WiFi network info.
+char ssid[] = "ssid";
+char wifiPassword[] = "wifiPassword";
 
 // Cayenne authentication info. This should be obtained from the Cayenne Dashboard.
 char username[] = "MQTT_USERNAME";
@@ -13,7 +18,7 @@ unsigned long lastMillis = 0;
 
 void setup() {
 	Serial.begin(9600);
-	Cayenne.begin(username, password, clientID);
+	Cayenne.begin(username, password, clientID, ssid, wifiPassword);
 }
 
 void loop() {

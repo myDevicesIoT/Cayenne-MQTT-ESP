@@ -2,7 +2,7 @@
 The MIT License(MIT)
 
 Cayenne Arduino Client Library
-Copyright © 2016 myDevices
+Copyright (c) 2016 myDevices
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files(the "Software"), to deal in the Software without restriction, including without limitation
@@ -115,11 +115,11 @@ public:
 	* Send device info
 	*/
 	void publishDeviceInfo() {
-		publishData(SYS_MODEL_TOPIC, CAYENNE_NO_CHANNEL, F(INFO_DEVICE));
-		publishData(SYS_CPU_MODEL_TOPIC, CAYENNE_NO_CHANNEL, F(INFO_CPU));
+		publishData(SYS_MODEL_TOPIC, CAYENNE_NO_CHANNEL, CAYENNE_FLASH(INFO_DEVICE));
+		publishData(SYS_CPU_MODEL_TOPIC, CAYENNE_NO_CHANNEL, CAYENNE_FLASH(INFO_CPU));
 		publishData(SYS_CPU_SPEED_TOPIC, CAYENNE_NO_CHANNEL, F_CPU);
-		publishData(SYS_VERSION_TOPIC, CAYENNE_NO_CHANNEL, F(CAYENNE_VERSION));
-	}
+		publishData(SYS_VERSION_TOPIC, CAYENNE_NO_CHANNEL, CAYENNE_FLASH(CAYENNE_VERSION));
+    }
 
 	/**
 	* Sends a measurement to a Cayenne channel
@@ -135,6 +135,19 @@ public:
 		publishData(DATA_TOPIC, channel, data, type, unit);
 	}
 
+	/**
+	* Sends an array of measurements to a Cayenne channel
+	*
+	* @param channel  Cayenne channel number
+	* @param values  Array of values to be sent
+	* @param type  Measurement type
+	*/
+	void virtualWrite(unsigned int channel, const CayenneDataArray& values, const char* type)
+	{
+		publishData(DATA_TOPIC, channel, values.getArray(), values.getCount(), type);
+	}
+
+#ifdef CAYENNE_USING_PROGMEM
 	/**
 	* Sends a measurement to a Cayenne channel
 	*
@@ -156,22 +169,11 @@ public:
 	* @param values  Array of values to be sent
 	* @param type  Measurement type
 	*/
-	void virtualWrite(unsigned int channel, const CayenneDataArray& values, const char* type)
-	{
-		publishData(DATA_TOPIC, channel, values.getArray(), values.getCount(), type);
-	}
-
-	/**
-	* Sends an array of measurements to a Cayenne channel
-	*
-	* @param channel  Cayenne channel number
-	* @param values  Array of values to be sent
-	* @param type  Measurement type
-	*/
 	void virtualWrite(unsigned int channel, const CayenneDataArray& values, const __FlashStringHelper* type)
 	{
 		publishData(DATA_TOPIC, channel, values.getArray(), values.getCount(), type);
 	}
+#endif
 
 	/**
 	* Sends a response after processing a command
@@ -208,7 +210,7 @@ public:
 	*/
 	void celsiusWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TYPE_TEMPERATURE), F(UNIT_CELSIUS));
+		virtualWrite(channel, value, CAYENNE_FLASH(TYPE_TEMPERATURE), CAYENNE_FLASH(UNIT_CELSIUS));
 	}
 
 	/**
@@ -219,7 +221,7 @@ public:
 	*/
 	void fahrenheitWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TYPE_TEMPERATURE), F(UNIT_FAHRENHEIT));
+		virtualWrite(channel, value, CAYENNE_FLASH(TYPE_TEMPERATURE), CAYENNE_FLASH(UNIT_FAHRENHEIT));
 	}
 
 	/**
@@ -230,7 +232,7 @@ public:
 	*/
 	void kelvinWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TYPE_TEMPERATURE), F(UNIT_KELVIN));
+		virtualWrite(channel, value, CAYENNE_FLASH(TYPE_TEMPERATURE), CAYENNE_FLASH(UNIT_KELVIN));
 	}
 
 	/**
@@ -241,7 +243,7 @@ public:
 	*/
 	void luxWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TYPE_LUMINOSITY), F(UNIT_LUX));
+		virtualWrite(channel, value, CAYENNE_FLASH(TYPE_LUMINOSITY), CAYENNE_FLASH(UNIT_LUX));
 	}
 
 	/**
@@ -252,7 +254,7 @@ public:
 	*/
 	void pascalWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TYPE_BAROMETRIC_PRESSURE), F(UNIT_PASCAL));
+		virtualWrite(channel, value, CAYENNE_FLASH(TYPE_BAROMETRIC_PRESSURE), CAYENNE_FLASH(UNIT_PASCAL));
 	}
 
 	/**
@@ -263,7 +265,7 @@ public:
 	*/
 	void hectoPascalWrite(unsigned int channel, float value)
 	{
-		virtualWrite(channel, value, F(TYPE_BAROMETRIC_PRESSURE), F(UNIT_HECTOPASCAL));
+		virtualWrite(channel, value, CAYENNE_FLASH(TYPE_BAROMETRIC_PRESSURE), CAYENNE_FLASH(UNIT_HECTOPASCAL));
 	}
 
 	/**
@@ -325,6 +327,20 @@ private:
 	}
 
 	/**
+	* Publish value array using specified topic suffix
+	* @param topic Cayenne topic
+	* @param channel Cayenne channel number
+	* @param values  Array of values to be sent
+	* @param valueCount  Count of values in array
+	* @param key Optional key to use for a key=data pair
+	*/
+	static void publishData(CayenneTopic topic, unsigned int channel, const CayenneValuePair values[], size_t valueCount, const char* key) {
+		CAYENNE_LOG_DEBUG("Publish: topic %d, channel %u, value %s, subkey %s, key %s", topic, channel, values[0].value, values[0].unit, key);
+		CayenneMQTTPublishDataArray(&_mqttClient, NULL, topic, channel, key, values, valueCount);
+	}
+
+#ifdef CAYENNE_USING_PROGMEM
+	/**
 	* Publish data using specified topic suffix
 	* @param topic Cayenne topic
 	* @param channel Cayenne channel number
@@ -349,25 +365,13 @@ private:
 	* @param valueCount  Count of values in array
 	* @param key Optional key to use for a key=data pair
 	*/
-	static void publishData(CayenneTopic topic, unsigned int channel, const CayenneValuePair values[], size_t valueCount, const char* key) {
-		CAYENNE_LOG_DEBUG("Publish: topic %d, channel %u, value %s, subkey %s, key %s", topic, channel, values[0].value, values[0].unit, key);
-		CayenneMQTTPublishDataArray(&_mqttClient, NULL, topic, channel, key, values, valueCount);
-	}
-
-	/**
-	* Publish value array using specified topic suffix
-	* @param topic Cayenne topic
-	* @param channel Cayenne channel number
-	* @param values  Array of values to be sent
-	* @param valueCount  Count of values in array
-	* @param key Optional key to use for a key=data pair
-	*/
 	static void publishData(CayenneTopic topic, unsigned int channel, const CayenneValuePair values[], size_t valueCount, const __FlashStringHelper* key) {
 		char keyBuffer[MAX_TYPE_LENGTH + 1];
 		CAYENNE_MEMCPY(keyBuffer, reinterpret_cast<const char *>(key), CAYENNE_STRLEN(reinterpret_cast<const char *>(key)) + 1);
 		CAYENNE_LOG_DEBUG("Publish: topic %d, channel %u, value %s, subkey %s, key %s", topic, channel, values[0].value, values[0].unit, keyBuffer);
 		CayenneMQTTPublishDataArray(&_mqttClient, NULL, topic, channel, keyBuffer, values, valueCount);
 	}
+#endif
 
 	/**
 	* Polls enabled digital channels and sends the matching pin's current value.
