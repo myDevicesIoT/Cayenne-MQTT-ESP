@@ -29,7 +29,7 @@ The Cayenne MQTT ESP8266 Library provides functions to easily connect to the [Ca
 2. Add a new device using the Bring Your Own Thing API selection.
 
 ### Building Examples
-1. Open the included example sketch from **File -> Examples -> Cayenne-MQTTT-ESP8266**.
+1. Open the included example sketch from **File -> Examples -> Cayenne-MQTT-ESP8266**.
 2. Modify the included sketch with your network info, and the Cayenne authentication info you received when adding your device.
 3. Compile and upload the sketch to your device. Uploading may require setting the device into bootload mode. For the Adafruit HUZZAH ESP8266 module this is done with the folowing steps:
   1. Hold down the **GPIO0** button.
