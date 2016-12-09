@@ -1,5 +1,5 @@
 # Cayenne MQTT ESP8266 Library
-The Cayenne MQTT ESP8266 Library provides functions to easily connect to the [Cayenne IoT project builder](https://www.cayenne-mydevices.com). This library is designed to work ESP8266 WiFi modules. With it you can send data to and receive data from Cayenne.
+The Cayenne MQTT ESP8266 Library provides functions to easily connect to the [Cayenne IoT project builder](https://www.cayenne-mydevices.com). This library is designed to work with ESP8266 WiFi modules. With it you can send data to and receive data from Cayenne.
 
 ![alt text](https://cdn-learn.adafruit.com/assets/assets/000/024/792/medium800/adafruit_products_2471_iso_assembled_01_ORIG.jpg?1429908417)
 
