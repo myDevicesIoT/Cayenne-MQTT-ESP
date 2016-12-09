@@ -8,7 +8,7 @@ The Cayenne MQTT ESP8266 Library provides functions to easily connect to the [Ca
 ## Requirements
 ### Hardware
 * An ESP8266 module, e.g. the [Adafruit HUZZAH ESP8266](https://www.adafruit.com/product/2471).
-* An FTDI or console cable.
+* A USB to Serial FTDI or console cable.
 
 ### Software
 * [Arduino IDE](https://www.arduino.cc/en/Main/Software) for Windows, Linux or Mac OS.
