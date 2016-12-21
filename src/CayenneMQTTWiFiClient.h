@@ -29,7 +29,7 @@ class CayenneMQTTWiFiClient : public CayenneArduinoMQTTClient
 {
 public:
 	/**
-	* Begins Cayenne session
+	* Begins Cayenne session and in the process establishes a WIFI connection with the supplied ssid and WIFI password
 	* @param username Cayenne username
 	* @param password Cayenne password
 	* @param clientID Cayennne client ID
@@ -60,6 +60,22 @@ public:
 		CAYENNE_LOG("IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
 		CayenneArduinoMQTTClient::begin(_wifiClient, username, password, clientID, WRITE_CHUNK_SIZE);
 	}
+	/**
+	* Begins Cayenne session, assumes that the WIFI is already up and running. 
+	* @param username Cayenne username
+	* @param password Cayenne password
+	* @param clientID Cayennne client ID
+	*/
+	void begin(const char* username, const char* password, const char* clientID)
+	{
+		if (WiFi.status() != WL_CONNECTED) {
+			CAYENNE_LOG("CayenneMQTTWiFiClient.begin called without WIFI being connected. Either use begin (..., ssid, wifipassword) to establish the connection here. Or setup the WIFI connection manually before calling this variant of the begin function");
+		}
+		IPAddress local_ip = WiFi.localIP();
+		CAYENNE_LOG("IP: %d.%d.%d.%d", local_ip[0], local_ip[1], local_ip[2], local_ip[3]);
+		CayenneArduinoMQTTClient::begin(_wifiClient, username, password, clientID, WRITE_CHUNK_SIZE);
+	}
+
 
 private:
 	WiFiClient _wifiClient;
