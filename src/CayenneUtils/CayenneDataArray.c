@@ -155,7 +155,7 @@ int CayenneDataArrayAddULong(CayenneDataArray* dataArray, const char* unit, unsi
 int CayenneDataArrayAddDouble(CayenneDataArray* dataArray, const char* unit, double value)
 {
 	char str[33];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
 	dtostrf(value, 5, 3, str);
 #else
 	snprintf(str, 33, "%2.3f", value);
@@ -173,7 +173,7 @@ int CayenneDataArrayAddDouble(CayenneDataArray* dataArray, const char* unit, dou
 int CayenneDataArrayAddFloat(CayenneDataArray* dataArray, const char* unit, float value)
 {
 	char str[33];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
 	dtostrf(value, 5, 3, str);
 #else
 	snprintf(str, 33, "%2.3f", value);

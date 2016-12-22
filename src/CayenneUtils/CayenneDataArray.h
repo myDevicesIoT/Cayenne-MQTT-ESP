@@ -158,7 +158,7 @@ namespace CayenneMQTT
 			add(unit, str);
 		}
 
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
 		/**
 		* Add the specified unit/value pair to the array.
 		* @param[in] unit The unit to add.
@@ -289,7 +289,7 @@ namespace CayenneMQTT
 		*/
 		inline void add(const __FlashStringHelper* unit, const float value) {
 			char str[33];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
 			dtostrf(value, 5, 3, str);
 #else
 			snprintf(str, 33, "%2.3f", value);
@@ -304,7 +304,7 @@ namespace CayenneMQTT
 		*/
 		inline void add(const __FlashStringHelper* unit, const double value) {
 			char str[33];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
+#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
 			dtostrf(value, 5, 3, str);
 #else
 			snprintf(str, 33, "%2.3f", value);
