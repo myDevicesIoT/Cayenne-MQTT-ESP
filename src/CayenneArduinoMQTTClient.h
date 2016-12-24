@@ -84,8 +84,15 @@ public:
 	/**
 	* Main Cayenne loop
 	*/
-	void loop() {
-		CayenneMQTTYield(&_mqttClient, 1000);
+	void loop(unsigned long minCommunicationIntervalMs = 1000, int yieldTimeMs = 10) {
+		//because we don't want to fload the backend with to many messages we make sure they are at least x time appart
+		static unsigned long millisOfLastLoopCommunication = millis();
+		if (millis() - millisOfLastLoopCommunication < 1000) {
+			return;
+		}
+		millisOfLastLoopCommunication = millis();
+		//go ahead with processing	
+		CayenneMQTTYield(&_mqttClient, yieldTimeMs);
 		pollChannels(virtualChannels);
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 		pollChannels(digitalChannels);
