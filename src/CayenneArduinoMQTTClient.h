@@ -476,7 +476,7 @@ void handleMessage(CayenneMessageData* messageData) {
 
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 void handleAnalogMessage(CayenneMessageData* messageData) {
-	float value = atof(messageData->values[0].value);
+	float value = atof(messageData->value);
 	char* response = NULL;
 	if (value >= 0 && value <= 1) {
 		double test = value * 255;
@@ -487,18 +487,18 @@ void handleAnalogMessage(CayenneMessageData* messageData) {
 	else {
 		response = ERROR_INCORRECT_PARAM;
 	}
-	CayenneArduinoMQTTClient::responseWrite(messageData->channel, response, messageData->id);
+	CayenneArduinoMQTTClient::responseWrite(response, messageData->id);
 }
 
 void handleDigitalMessage(CayenneMessageData* messageData) {
 	char* response = NULL;
-	if (messageData->values[0].value && strlen(messageData->values[0].value) == 1) {
-		CAYENNE_LOG_DEBUG("dw %s, channel %d", messageData->values[0].value, messageData->channel);
-		if (messageData->values[0].value[0] == '0') {
+	if (messageData->value && strlen(messageData->value) == 1) {
+		CAYENNE_LOG_DEBUG("dw %s, channel %d", messageData->value, messageData->channel);
+		if (messageData->value[0] == '0') {
 			digitalWrite(messageData->channel, LOW);
 			CayenneArduinoMQTTClient::publishState(DIGITAL_TOPIC, messageData->channel, LOW);
 		}
-		else if (messageData->values[0].value[0] == '1') {
+		else if (messageData->value[0] == '1') {
 			digitalWrite(messageData->channel, HIGH);
 			CayenneArduinoMQTTClient::publishState(DIGITAL_TOPIC, messageData->channel, HIGH);
 		}
@@ -509,7 +509,7 @@ void handleDigitalMessage(CayenneMessageData* messageData) {
 	else {
 		response = ERROR_INCORRECT_PARAM;
 	}
-	CayenneArduinoMQTTClient::responseWrite(messageData->channel, response, messageData->id);
+	CayenneArduinoMQTTClient::responseWrite(response, messageData->id);
 }
 #endif
 
