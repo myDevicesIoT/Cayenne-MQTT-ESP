@@ -33,8 +33,8 @@
   #define DLLExport
 #endif
 
+#include <stdio.h>
 #include "../MQTTCommon/MQTTPacket.h"
-#include "stdio.h"
 #include "PlatformHeader.h"
 
 #if defined(MQTTCLIENT_PLATFORM_HEADER)

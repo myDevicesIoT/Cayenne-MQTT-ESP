@@ -19,8 +19,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define _CAYENNETYPES_h
 
 // Data types
+#define TYPE_ACCELERATION "accel" // Acceleration
 #define TYPE_BAROMETRIC_PRESSURE "bp" // Barometric pressure
 #define TYPE_BATTERY "batt" // Battery
+#define TYPE_GPS "gps" // GPS data
 #define TYPE_LUMINOSITY "lum" // Luminosity
 #define TYPE_PROXIMITY "prox" // Proximity
 #define TYPE_RELATIVE_HUMIDITY "rel_hum" // Relative Humidity
@@ -44,6 +46,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define UNIT_CELSIUS "c" // Celsius
 #define UNIT_KELVIN "k" // Kelvin
 #define UNIT_MILLIVOLTS "mv" // Millivolts
+#define UNIT_GRAVITY "g" // Standard gravity
 
 #define MAX_UNIT_LENGTH 4
 

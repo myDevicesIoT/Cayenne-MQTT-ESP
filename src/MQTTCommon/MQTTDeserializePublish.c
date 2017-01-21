@@ -33,7 +33,7 @@
   * @return error code.  1 is success
   */
 int MQTTDeserialize_publish(unsigned char* dup, int* qos, unsigned char* retained, unsigned short* packetid, MQTTString* topicName,
-		unsigned char** payload, int* payloadlen, unsigned char* buf, int buflen)
+		unsigned char** payload, size_t* payloadlen, unsigned char* buf, size_t buflen)
 {
 	MQTTHeader header = {0};
 	unsigned char* curdata = buf;
@@ -76,7 +76,7 @@ exit:
   * @param buflen the length in bytes of the data in the supplied buffer
   * @return error code.  1 is success, 0 is failure
   */
-int MQTTDeserialize_ack(unsigned char* packettype, unsigned char* dup, unsigned short* packetid, unsigned char* buf, int buflen)
+int MQTTDeserialize_ack(unsigned char* packettype, unsigned char* dup, unsigned short* packetid, unsigned char* buf, size_t buflen)
 {
 	MQTTHeader header = {0};
 	unsigned char* curdata = buf;

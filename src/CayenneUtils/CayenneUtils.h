@@ -40,15 +40,6 @@ extern "C" {
 enum CayenneReturnCode { CAYENNE_BUFFER_OVERFLOW = -2, CAYENNE_FAILURE = -1, CAYENNE_SUCCESS = 0 };
 
 /**
-* A unit/value pair used in Cayenne payloads.
-*/
-typedef struct CayenneValuePair
-{
-	const char* unit; /**< The data unit. */
-	const char* value; /**< The data value. */
-} CayenneValuePair;
-
-/**
 * Build a specified topic string.
 * @param[out] topicName Returned topic string
 * @param[in] length CayenneTopic buffer length
@@ -65,11 +56,11 @@ DLLExport int CayenneBuildTopic(char* topicName, size_t length, const char* user
 * @param[out] payload Returned payload
 * @param[in,out] length Payload buffer length
 * @param[in] type Optional type to use for type,unit=value payload, can be NULL
-* @param[in] values Unit/value array
-* @param[in] valueCount Number of values
+* @param[in] unit Payload unit
+* @param[in] value Payload value
 * @return CAYENNE_SUCCESS if topic string was created, error code otherwise
 */
-DLLExport int CayenneBuildDataPayload(char* payload, size_t* length, const char* type, const CayenneValuePair* values, size_t valueCount);
+DLLExport int CayenneBuildDataPayload(char* payload, size_t* length, const char* type, const char* unit, const char* value);
 
 /**
 * Build a specified response payload.
@@ -91,19 +82,19 @@ DLLExport int CayenneBuildResponsePayload(char* payload, size_t* length, const c
 * @param[in] length Topic name string length
 * @return CAYENNE_SUCCESS if topic was parsed, error code otherwise
 */
-DLLExport int CayenneParseTopic(CayenneTopic* topic, unsigned int* channel, const char** clientID, const char* username, char* topicName, unsigned int length);
+DLLExport int CayenneParseTopic(CayenneTopic* topic, unsigned int* channel, const char** clientID, const char* username, char* topicName, size_t length);
 
 /**
 * Parse a null terminated payload in place. This may modify the payload string. 
-* @param[out] values Returned payload data unit & value array
-* @param[in,out] valuesSize Size of values array, returns the count of values in the array
 * @param[out] type Returned type, NULL if there is none
+* @param[out] unit Returned unit, NULL if there is none
+* @param[out] value Returned value, NULL if there is none
 * @param[out] id Returned message id, empty string if there is none
 * @param[in] topic Cayenne topic
 * @param[in] payload Payload string, must be null terminated.
 * @return CAYENNE_SUCCESS if topic string was created, error code otherwise
 */
-DLLExport int CayenneParsePayload(CayenneValuePair* values, size_t* valuesSize, const char** type, const char** id, CayenneTopic topic, char* payload);
+DLLExport int CayenneParsePayload(const char** type, const char** unit, const char** value, const char** id, CayenneTopic topic, char* payload);
 
 #if defined(__cplusplus)
 }

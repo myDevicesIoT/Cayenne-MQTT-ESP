@@ -28,11 +28,10 @@ namespace CayenneMQTT
 {
 	/**
 	* @class DataArray
-	* Class for manipulating a data array of unit/value pairs.
+	* Class for manipulating a data array.
 	* @param BUFFER_SIZE Maximum buffer size to use for data array, in bytes.
-	* @param MAX_VALUES Maximum number of unit/value pairs in the array.
 	*/
-	template<int BUFFER_SIZE = CAYENNE_MAX_PAYLOAD_SIZE, int MAX_VALUES = CAYENNE_MAX_MESSAGE_VALUES>
+	template<int BUFFER_SIZE = CAYENNE_MAX_PAYLOAD_VALUE_SIZE>
 	class DataArray
 	{
 	public:
@@ -47,290 +46,174 @@ namespace CayenneMQTT
 		* Clear the array.
 		*/
 		void clear() {
-			for (int i = 0; i < CAYENNE_MAX_MESSAGE_VALUES; ++i) {
-				_values[i].unit = NULL;
-				_values[i].value = NULL;
-			}
+			_buffer[0] = '['; // Opening bracket for array
+			_buffer[1] = '\0';
 			_valueCount = 0;
-			_index = 0;
+			_index = 1;
 		}
 
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
-		* @param[in] unitInFlash If true the unit string is in flash memory, otherwise false.
 		* @param[in] valueInFlash If true the value string is in flash memory, otherwise false.
 		*/
-		void add(const char* unit, const char* value, bool unitInFlash = false, bool valueInFlash = false) {
-			if (_valueCount >= CAYENNE_MAX_MESSAGE_VALUES)
-				return;
-
-			size_t unitLength = 0;
-			if (unit) {
-				unitLength = (unitInFlash ? CAYENNE_STRLEN(unit) : strlen(unit)) + 1;
-			}
+		void add(const char* value, bool valueInFlash = false) {
 			size_t valueLength = 0;
 			if (value) {
 				valueLength = (valueInFlash ? CAYENNE_STRLEN(value) : strlen(value)) + 1;
-			}
-			if (_index + unitLength + valueLength > BUFFER_SIZE)
-				return;
-
-			if (unit) {
-				unitInFlash ? CAYENNE_MEMCPY(_buffer + _index, unit, unitLength) : memcpy(_buffer + _index, unit, unitLength);
-				_values[_valueCount].unit = _buffer + _index;
-				_index += unitLength;
-			}
-			else {
-				_values[_valueCount].unit = NULL;
-			}
-
-			if (value) {
+				// Make sure the value string along with comma & array bracket will fit in buffer.
+				if (_index + valueLength + 2 > BUFFER_SIZE)
+					return;
+				if (_valueCount > 0 && _index > 1) {
+					if (_buffer[--_index - 1] == ']')
+						--_index;
+					_buffer[_index++] = ',';
+				}
 				valueInFlash ? CAYENNE_MEMCPY(_buffer + _index, value, valueLength) : memcpy(_buffer + _index, value, valueLength);
-				_values[_valueCount].value = _buffer + _index;
 				_index += valueLength;
+				if (_valueCount > 0 && _index > 1) {
+					// Only append the closing bracket if multiple items are added. That way the getString() function can be used get 
+					// the string value without a closing bracket if this class is being used to convert single values to strings.
+					_buffer[_index - 1] = ']';
+					_buffer[_index] = '\0';
+				}
+				++_valueCount;
 			}
-			else {
-				_values[_valueCount].value = NULL;
-			}
-
-			_valueCount++;
 		}
 
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
 		*/
-		inline void add(const char* unit, const int value) {
+		inline void add(const int value) {
 			char str[2 + 8 * sizeof(value)];
 #if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
 			itoa(value, str, 10);
 #else
 			snprintf(str, sizeof(str), "%d", value);
 #endif
-			add(unit, str);
+			add(str);
 		}
 
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
 		*/
-		inline void add(const char* unit, const unsigned int value) {
+		inline void add(const unsigned int value) {
 			char str[1 + 8 * sizeof(value)];
 #if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
 			utoa(value, str, 10);
 #else
 			snprintf(str, sizeof(str), "%u", value);
 #endif
-			add(unit, str);
+			add(str);
 		}
 
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
 		*/
-		inline void add(const char* unit, const long value) {
+		inline void add(const long value) {
 			char str[2 + 8 * sizeof(value)];
 #if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
 			ltoa(value, str, 10);
 #else
 			snprintf(str, sizeof(str), "%ld", value);
 #endif
-			add(unit, str);
+			add(str);
 		}
 
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
 		*/
-		inline void add(const char* unit, const unsigned long value) {
+		inline void add(const unsigned long value) {
 			char str[1 + 8 * sizeof(value)];
 #if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32)
 			ultoa(value, str, 10);
 #else
 			snprintf(str, sizeof(str), "%lu", value);
 #endif
-			add(unit, str);
+			add(str);
 		}
 
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
+#if defined (__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
+		* @param[in] precision Number of digits after the decimal.
 		*/
-		inline void add(const char* unit, const float value) {
+		inline void add(const float value, unsigned char precision = 3) {
 			char str[33];
-			dtostrf(value, 5, 3, str);
-			add(unit, str);
+			dtostrf(value, 1, precision, str);
+			add(str);
 		}
 
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
+		* @param[in] precision Number of digits after the decimal.
 		*/
-		inline void add(const char* unit, const double value) {
+		inline void add(const double value, unsigned char precision = 3) {
 			char str[33];
-			dtostrf(value, 5, 3, str);
-			add(unit, str);
+			dtostrf(value, 1, precision, str);
+			add(str);
 		}
 
 #else
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
+		* @param[in] precision Number of digits after the decimal.
 		*/
-		inline void add(const char* unit, const float value) {
+		inline void add(const float value, unsigned char precision = 3) {
 			char str[33];
-			snprintf(str, 33, "%2.3f", value);
-			add(unit, str);
+			snprintf(str, 33, "%.*f", precision, value);
+			add(str);
 		}
 
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
+		* Add the specified value to the array.
+		* @param[in] precision Number of digits after the decimal.
 		*/
-		inline void add(const char* unit, const double value) {
+		inline void add(const double value, unsigned char precision = 3) {
 			char str[33];
-			snprintf(str, 33, "%2.3f", value);
-			add(unit, str);
+			snprintf(str, 33, "%.*f", precision, value);
+			add(str);
 		}
 
 #endif
 
 #ifdef CAYENNE_USING_PROGMEM
 		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
+		* Add the specified value to the array.
 		* @param[in] value The value to add.
 		*/
-		void add(const char* unit, const __FlashStringHelper* value) {
+		void add(const __FlashStringHelper* value) {
 			const char* valueString = reinterpret_cast<const char *>(value);
-			add(unit, valueString, false, true);
-		}
-
-		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
-		*/
-		void add(const __FlashStringHelper* unit, const char* value) {
-			const char* unitString = reinterpret_cast<const char *>(unit);
-			add(unitString, value, true, false);
-		}
-		
-		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
-		*/
-		void add(const __FlashStringHelper* unit, const __FlashStringHelper* value) {
-			const char* unitString = reinterpret_cast<const char *>(unit);
-			const char* valueString = reinterpret_cast<const char *>(value);
-			add(unitString, valueString, true, true);
-		}
-
-		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
-		*/
-		inline void add(const __FlashStringHelper* unit, const int value) {
-			char str[2 + 8 * sizeof(value)];
-			itoa(value, str, 10);
-			add(unit, str);
-		}
-
-		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
-		*/
-		inline void add(const __FlashStringHelper* unit, const unsigned int value) {
-			char str[1 + 8 * sizeof(value)];
-			utoa(value, str, 10);
-			add(unit, str);
-		}
-
-		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
-		*/
-		inline void add(const __FlashStringHelper* unit, const long value) {
-			char str[2 + 8 * sizeof(value)];
-			ltoa(value, str, 10);
-			add(unit, str);
-		}
-		
-		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
-		*/
-		inline void add(const __FlashStringHelper* unit, const unsigned long value) {
-			char str[1 + 8 * sizeof(value)];
-			ultoa(value, str, 10);
-			add(unit, str);
-		}
-
-		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
-		*/
-		inline void add(const __FlashStringHelper* unit, const float value) {
-			char str[33];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
-			dtostrf(value, 5, 3, str);
-#else
-			snprintf(str, 33, "%2.3f", value);
-#endif
-			add(unit, str);
-		}
-
-		/**
-		* Add the specified unit/value pair to the array.
-		* @param[in] unit The unit to add.
-		* @param[in] value The value to add.
-		*/
-		inline void add(const __FlashStringHelper* unit, const double value) {
-			char str[33];
-#if defined(__AVR__) || defined (ARDUINO_ARCH_ARC32) || defined (ESP8266)
-			dtostrf(value, 5, 3, str);
-#else
-			snprintf(str, 33, "%2.3f", value);
-#endif
-			add(unit, str);
+			add(valueString, true);
 		}
 
 #endif
 		/**
-		* Get the unit/value pair array.
-		* @return Pointer to the array.
+		* Get the value string.
+		* @return If there are multiple values this will return the full array string with brackets, otherwise just the single value string without brackets.
 		*/
-		const CayenneValuePair* getArray() const {
-			return _values;
+		const char* getString() const {
+			if (_valueCount > 1)
+				return _buffer;
+			return &_buffer[1];
 		}
 
 		/**
-		* Get the number of items in the unit/value pair array.
+		* Get the number of items in the value array.
 		* @return Count of items.
 		*/
-    	const size_t getCount() const {
+    	size_t getCount() const {
 			return _valueCount;
 		}
 
 	private:
-		CayenneValuePair _values[MAX_VALUES];
 		size_t _valueCount;
 		char _buffer[BUFFER_SIZE];
 		size_t _index;
@@ -338,96 +221,6 @@ namespace CayenneMQTT
 }
 
 typedef CayenneMQTT::DataArray<> CayenneDataArray;
-
-#else
-
-	// C version of the data array. Requires source file to be compiled and linked.
-
-	typedef struct CayenneDataArray
-	{
-		CayenneValuePair values[CAYENNE_MAX_MESSAGE_VALUES];
-		unsigned int valueCount;
-		char* buffer;
-		unsigned int bufferSize;
-		unsigned int bufferIndex;
-	} CayenneDataArray;
-
-	/**
-	* Initialize a data array of unit/value pairs.
-	* @param[out] dataArray The initialized data array
-	* @param[in] buffer Buffer for storing unit/value pairs. This buffer should be available for as long as the data array is used.
-	* @param[in] bufferSize Size of the buffer
-	*/
-	DLLExport void CayenneDataArrayInit(CayenneDataArray* dataArray, char* buffer, unsigned int bufferSize);
-
-	/**
-	* Add the specified unit/value pair to the array.
-	* @param[in] dataArray The data array to add values to
-	* @param[in] unit The unit to add
-	* @param[in] value The value to add
-	* @return CAYENNE_SUCCESS if unit/value pair was add, CAYENNE_FAILURE otherwise
-	*/
-	DLLExport int CayenneDataArrayAdd(CayenneDataArray* dataArray, const char* unit, const char* value);
-
-	/**
-	* Add the specified unit/value pair to the array.
-	* @param[in] dataArray The data array to add values to
-	* @param[in] unit The unit to add
-	* @param[in] value The value to add
-	* @return CAYENNE_SUCCESS if unit/value pair was add, CAYENNE_FAILURE otherwise
-	*/
-	DLLExport int CayenneDataArrayAddInt(CayenneDataArray* dataArray, const char* unit, int value);
-
-	/**
-	* Add the specified unit/value pair to the array.
-	* @param[in] dataArray The data array to add values to
-	* @param[in] unit The unit to add
-	* @param[in] value The value to add
-	* @return CAYENNE_SUCCESS if unit/value pair was add, CAYENNE_FAILURE otherwise
-	*/
-	DLLExport int CayenneDataArrayAddUInt(CayenneDataArray* dataArray, const char* unit, unsigned int value);
-
-	/**
-	* Add the specified unit/value pair to the array.
-	* @param[in] dataArray The data array to add values to
-	* @param[in] unit The unit to add
-	* @param[in] value The value to add
-	* @return CAYENNE_SUCCESS if unit/value pair was add, CAYENNE_FAILURE otherwise
-	*/
-	DLLExport int CayenneDataArrayAddLong(CayenneDataArray* dataArray, const char* unit, long value);
-
-	/**
-	* Add the specified unit/value pair to the array.
-	* @param[in] dataArray The data array to add values to
-	* @param[in] unit The unit to add
-	* @param[in] value The value to add
-	* @return CAYENNE_SUCCESS if unit/value pair was add, CAYENNE_FAILURE otherwise
-	*/
-	DLLExport int CayenneDataArrayAddULong(CayenneDataArray* dataArray, const char* unit, unsigned long value);
-
-	/**
-	* Add the specified unit/value pair to the array.
-	* @param[in] dataArray The data array to add values to
-	* @param[in] unit The unit to add
-	* @param[in] value The value to add
-	* @return CAYENNE_SUCCESS if unit/value pair was add, CAYENNE_FAILURE otherwise
-	*/
-	DLLExport int CayenneDataArrayAddDouble(CayenneDataArray* dataArray, const char* unit, double value);
-
-	/**
-	* Add the specified unit/value pair to the array.
-	* @param[in] dataArray The data array to add values to
-	* @param[in] unit The unit to add
-	* @param[in] value The value to add
-	* @return CAYENNE_SUCCESS if unit/value pair was add, CAYENNE_FAILURE otherwise
-	*/
-	DLLExport int CayenneDataArrayAddFloat(CayenneDataArray* dataArray, const char* unit, float value);
-
-	/**
-	* Clear the data array.
-	* @param[in] dataArray The data array to clear
-	*/
-	DLLExport void CayenneDataArrayClear(CayenneDataArray* dataArray);
 
 #endif
 

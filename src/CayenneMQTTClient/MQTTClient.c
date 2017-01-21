@@ -268,7 +268,7 @@ int cycle(MQTTClient* c, Timer* timer)
             MQTTMessage msg;
             int intQoS;
             if (MQTTDeserialize_publish(&msg.dup, &intQoS, &msg.retained, &msg.id, &topicName,
-               (unsigned char**)&msg.payload, (int*)&msg.payloadlen, c->readbuf, c->readbuf_size) != 1)
+               (unsigned char**)&msg.payload, &msg.payloadlen, c->readbuf, c->readbuf_size) != 1)
                 goto exit;
             msg.qos = (enum QoS)intQoS;
             deliverMessage(c, &topicName, &msg);

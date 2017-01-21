@@ -32,8 +32,7 @@ void MQTTMessageArrived(MessageData* md, void* userData)
 			return;
 		//Null terminate the string since that is required by CayenneParsePayload. The readbuf is set to CAYENNE_MAX_MESSAGE_SIZE+1 to allow for appending a null.
 		((char*)md->message->payload)[md->message->payloadlen] = '\0';
-		message.valueCount = CAYENNE_MAX_MESSAGE_VALUES;
-		result = CayenneParsePayload(message.values, &message.valueCount, &message.type, &message.id, message.topic, (char*)md->message->payload);
+		result = CayenneParsePayload(&message.type, &message.unit, &message.value, &message.id, message.topic, (char*)md->message->payload);
 		if (result != CAYENNE_SUCCESS)
 			return;
 
@@ -110,10 +109,24 @@ int CayenneMQTTConnect(CayenneMQTTClient* client)
 */
 int CayenneMQTTPublishData(CayenneMQTTClient* client, const char* clientID, CayenneTopic topic, unsigned int channel, const char* type, const char* unit, const char* value)
 {
-	CayenneValuePair valuePair[1];
-	valuePair[0].value = value;
-	valuePair[0].unit = unit;
-	return CayenneMQTTPublishDataArray(client, clientID, topic, channel, type, valuePair, 1);
+	char buffer[CAYENNE_MAX_MESSAGE_SIZE + 1] = { 0 };
+	int result = CayenneBuildTopic(buffer, sizeof(buffer), client->username, clientID ? clientID : client->clientID, topic, channel);
+	if (result == CAYENNE_SUCCESS) {
+		size_t size = strlen(buffer);
+		char* payload = &buffer[size + 1];
+		size = sizeof(buffer) - (size + 1);
+		result = CayenneBuildDataPayload(payload, &size, type, unit, value);
+		if (result == CAYENNE_SUCCESS) {
+			MQTTMessage message;
+			message.qos = QOS0;
+			message.retained = (topic != COMMAND_TOPIC) ? 1 : 0;
+			message.dup = 0;
+			message.payload = (void*)payload;
+			message.payloadlen = size;
+			result = MQTTPublish(&client->mqttClient, buffer, &message);
+		}
+	}
+	return result;
 }
 
 
@@ -254,38 +267,6 @@ int CayenneMQTTPublishDataFloat(CayenneMQTTClient* client, const char* clientID,
 	return CayenneMQTTPublishData(client, clientID, topic, channel, type, unit, str);
 }
 
-/**
-* Send multiple value data array to Cayenne.
-* @param[in] client The client object
-* @param[in] clientID The client ID to use in the topic, NULL to use the clientID the client was initialized with
-* @param[in] topic Cayenne topic
-* @param[in] channel The channel to send data to, or CAYENNE_NO_CHANNEL if there is none
-* @param[in] type Optional type to use for a type=value pair, can be NULL
-* @param[in] values Unit/value array
-* @param[in] valueCount Number of values
-* @return success code
-*/
-int CayenneMQTTPublishDataArray(CayenneMQTTClient* client, const char* clientID, CayenneTopic topic, unsigned int channel, const char* type, const CayenneValuePair* values, size_t valueCount)
-{
-	char buffer[CAYENNE_MAX_MESSAGE_SIZE + 1] = { 0 };
-	int result = CayenneBuildTopic(buffer, sizeof(buffer), client->username, clientID ? clientID : client->clientID, topic, channel);
-	if (result == CAYENNE_SUCCESS) {
-		size_t size = strlen(buffer);
-		char* payload = &buffer[size + 1];
-		size = sizeof(buffer) - (size + 1);
-		result = CayenneBuildDataPayload(payload, &size, type, values, valueCount);
-		if (result == CAYENNE_SUCCESS) {
-			MQTTMessage message;
-			message.qos = QOS0;
-			message.retained = 1;
-			message.dup = 0;
-			message.payload = (void*)payload;
-			message.payloadlen = size;
-			result = MQTTPublish(&client->mqttClient, buffer, &message);
-		}
-	}
-	return result;
-}
 
 /**
 * Send a response to a channel.

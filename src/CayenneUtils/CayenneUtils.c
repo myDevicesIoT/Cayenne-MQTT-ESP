@@ -162,7 +162,7 @@ int buildSuffix(char* suffix, size_t length, const CayenneTopic topic, unsigned 
 * @param[in] topicNameLen CayenneTopic name length
 * return true if topic matches, false otherwise
 */
-int topicMatches(char* filter, char* topicName, unsigned int topicNameLen)
+int topicMatches(char* filter, char* topicName, size_t topicNameLen)
 {
 	char* curf = filter;
 	char* curn = topicName;
@@ -190,116 +190,37 @@ int topicMatches(char* filter, char* topicName, unsigned int topicNameLen)
 }
 
 /**
-* Get the count of values in a message.
-* @param[out] count Returned number of values found in message
-* @param[in] payload Payload string, must be null terminated
-* @param[in] token Character token for splitting "unit=value" payloads, 0 to just parse first comma delimited value
-* @return CAYENNE_SUCCESS if value count succeeded, error code otherwise
-*/
-int getValueCount(size_t* count, char* payload, char token) {
-	char* index = payload;
-	size_t unitCount = 0;
-	size_t valueCount = 0;
-	int countingValues = 0;
-
-	if (token == 0) {
-		//Currently there can only be one value in payload if this isn't a "unit=value" payload.
-		*count = 1;
-		return CAYENNE_SUCCESS;
-	}
-
-	*count = 0;
-	while (*index && index != '\0') {
-		if ((*index == ',') || (*index == token)) {
-			if (*index == ',') {
-				if (countingValues) {
-					valueCount++;
-				}
-				else {
-					unitCount++;
-				}
-			}
-			else if (*index == token) {
-				countingValues = 1;
-				valueCount++;
-			}
-		}
-		index++;
-	}
-	
-	if (countingValues) {
-		if ((valueCount != unitCount) && !(unitCount == 0 && valueCount == 1)) {
-			return CAYENNE_FAILURE;
-		}
-	}
-	else {
-		valueCount = 1;
-	}
-	*count = valueCount;
-	return CAYENNE_SUCCESS;
-}
-
-/**
 * Parse a null terminated payload string in place. This may modify the payload string.
-* @param[out] values Returned payload data unit & value array
-* @param[in,out] valuesSize Size of values array, returns the count of values in the array
 * @param[out] type Returned type, NULL if there is none
+* @param[out] unit Returned unit, NULL if there is none
+* @param[out] value Returned value, NULL if there is none
 * @param[in] payload Payload string, must be null terminated
 * @param[in] token Character token for splitting "unit=value" payloads, 0 to just parse first comma delimited value
 * @return CAYENNE_SUCCESS if value and id were parsed, error code otherwise
 */
-int parsePayload(CayenneValuePair* values, size_t* valuesSize, const char** type, char* payload, char token) {
+int parsePayload(const char** type, const char** unit, const char** value, char* payload, char token) {
 	char* index = payload;
-	size_t count = 0;
-	int parsingValues = 0;
-	size_t valueIndex = 0;
-#ifdef PARSE_INFO_PAYLOADS
-	int result = getValueCount(&count, payload, token);
-	if (result != CAYENNE_SUCCESS) {
-		*valuesSize = 0;
-		return result;
-	}
-#else
-	count = 1;
-#endif
-
-	if(token == 0)
-		parsingValues = 1; //Don't need to parse units if there is no unit/value separator
-
-	values[0].value = NULL;
-	values[0].unit = NULL;
 	*type = NULL;
+	*unit = NULL;
+	*value = NULL;
 	while (*index && index != '\0') {
 		if ((*index == ',') || (*index == token)) {
 			if (*index == ',') {
 				*type = payload;
-				if (valueIndex < *valuesSize) {
-					if (parsingValues) {
-						values[valueIndex].value = index + 1;
-					}
-					else {
-						values[valueIndex].unit = index + 1;
-					}
-				}
+				*unit = index + 1;
 				*index = '\0';
-				valueIndex++;
 				if (token == 0)
 					break;
 			}
-			else if (*index == token && !parsingValues) {
-				parsingValues = 1;
-				valueIndex = 0;
+			else if (*index == token) {
 				*type = payload;
-				values[valueIndex].value = index + 1;
+				*value = index + 1;
 				*index = '\0';
-				valueIndex++;
-				if (count == valueIndex)
-					break;
+				break;
 			}
 		}
 		index++;
 	};
-	*valuesSize = count;
 	return CAYENNE_SUCCESS;
 }
 
@@ -326,23 +247,20 @@ int CayenneBuildTopic(char* topicName, size_t length, const char* username, cons
 * @param[out] payload Returned payload
 * @param[in,out] length Payload buffer length
 * @param[in] type Optional type to use for type,unit=value payload, can be NULL
-* @param[in] values Unit/value array
-* @param[in] valueCount Number of values
+* @param[in] unit Payload unit
+* @param[in] value Payload value
 * @return CAYENNE_SUCCESS if topic string was created, error code otherwise
 */
-int CayenneBuildDataPayload(char* payload, size_t* length, const char* type, const CayenneValuePair* values, size_t valueCount) {
-	int i;
+int CayenneBuildDataPayload(char* payload, size_t* length, const char* type, const char* unit, const char* value) {
 	size_t payloadLength = 0;
-	for (i = 0; i < valueCount; ++i) {
-		if (values[i].unit) {
-			payloadLength += strlen(values[i].unit) + 1;
-		}
-		else if (type) {
-			// If type exists but unit does not, use UNIT_UNDEFINED for the unit.
-			payloadLength += strlen(UNIT_UNDEFINED) + 1;
-		}
-		payloadLength += values[i].value ? strlen(values[i].value) + 1 : 0;
+	if (unit) {
+		payloadLength += strlen(unit) + 1;
 	}
+	else if (type) {
+		// If type exists but unit does not, use UNIT_UNDEFINED for the unit.
+		payloadLength += strlen(UNIT_UNDEFINED) + 1;
+	}
+	payloadLength += value ? strlen(value) + 1 : 0;
 	payloadLength += type ? strlen(type) + 1 : 0;
 	//If payload can't fit the payload plus a terminating null byte return.
 	if (payloadLength > *length) {
@@ -353,21 +271,16 @@ int CayenneBuildDataPayload(char* payload, size_t* length, const char* type, con
 	if (type) {
 		strcat(payload, type);
 	}
-	for (i = 0; i < valueCount; ++i) {
-		if (payload[0] != '\0')
-			strcat(payload, ",");
-		if (values[i].unit)
-			strcat(payload, values[i].unit);
-		else if (type)
-			strcat(payload, UNIT_UNDEFINED);
-	}
-	if (payload[0] != '\0' && valueCount > 0 && values[0].value)
+	if (payload[0] != '\0')
+		strcat(payload, ",");
+	if (unit)
+		strcat(payload, unit);
+	else if (type)
+		strcat(payload, UNIT_UNDEFINED);
+	if (payload[0] != '\0' && value)
 		strcat(payload, "=");
-	for (i = 0; i < valueCount && values[i].value; ++i) {
-		strcat(payload, values[i].value);
-		if (i + 1 < valueCount)
-			strcat(payload, ",");
-	}
+	if (value)
+		strcat(payload, value);
 	*length = --payloadLength; //Subtract terminating null 
 	return CAYENNE_SUCCESS;
 }
@@ -381,13 +294,10 @@ int CayenneBuildDataPayload(char* payload, size_t* length, const char* type, con
 * @return CAYENNE_SUCCESS if payload string was created, error code otherwise
 */
 int CayenneBuildResponsePayload(char* payload, size_t* length, const char* id, const char* error) {
-	CayenneValuePair values[1];
-	values[0].unit = id;
-	values[0].value = error;
 	if (error) {
-		return CayenneBuildDataPayload(payload, length, "error", values, 1);
+		return CayenneBuildDataPayload(payload, length, "error", id, error);
 	}
-	return CayenneBuildDataPayload(payload, length, "ok", values, 1);
+	return CayenneBuildDataPayload(payload, length, "ok", id, error);
 }
 
 /**
@@ -400,7 +310,7 @@ int CayenneBuildResponsePayload(char* payload, size_t* length, const char* id, c
 * @param[in] length Topic name string length
 * @return CAYENNE_SUCCESS if topic was parsed, error code otherwise
 */
-int CayenneParseTopic(CayenneTopic* topic, unsigned int* channel, const char** clientID, const char* username, char* topicName, unsigned int length) {
+int CayenneParseTopic(CayenneTopic* topic, unsigned int* channel, const char** clientID, const char* username, char* topicName, size_t length) {
 	char* index = NULL;
 	int i = 0;
 	TopicChannel parseTopics[PARSE_TOPICS_COUNT] = { { COMMAND_TOPIC, CAYENNE_ALL_CHANNELS },{ CONFIG_TOPIC, CAYENNE_ALL_CHANNELS },
@@ -478,42 +388,37 @@ int CayenneParseTopic(CayenneTopic* topic, unsigned int* channel, const char** c
 
 /**
 * Parse a null terminated payload in place. This may modify the payload string.
-* @param[out] values Returned payload data unit & value array
-* @param[in,out] valuesSize Size of values array, returns the count of values in the array
 * @param[out] type Returned type, NULL if there is none
+* @param[out] unit Returned unit, NULL if there is none
+* @param[out] value Returned value, NULL if there is none
 * @param[out] id Returned message id, empty string if there is none
 * @param[in] topic Cayenne topic
 * @param[in] payload Payload string, must be null terminated.
 * @return CAYENNE_SUCCESS if topic string was created, error code otherwise
 */
-int CayenneParsePayload(CayenneValuePair* values, size_t* valuesSize, const char** type, const char** id, CayenneTopic topic, char* payload) {
-	int i;
-	if (!payload || !valuesSize || *valuesSize == 0)
+int CayenneParsePayload(const char** type, const char** unit, const char** value, const char** id, CayenneTopic topic, char* payload) {
+	if (!payload)
 		return CAYENNE_FAILURE;
 
 	*type = NULL;
+	*unit = NULL;
+	*value = NULL;
 	*id = NULL;
-	for(i = 0; i < *valuesSize; i++) {
-		values[i].unit = NULL;
-		values[i].value = NULL;
-	}
 	switch (topic)
 	{
 #ifdef PARSE_INFO_PAYLOADS
 	case DATA_TOPIC:
-		parsePayload(values, valuesSize, type, payload, '=');
-		if (!values[0].value)
+		parsePayload(type, unit, value, payload, '=');
+		if (!*value)
 			return CAYENNE_FAILURE;
 		break;
 #endif
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 #ifdef PARSE_INFO_PAYLOADS
 	case ANALOG_TOPIC:
-		parsePayload(values, valuesSize, type, payload, 0);
-		values[0].unit = values[0].value; //Use unit to store resolution
-		values[0].value = *type;
-		*type = NULL; 
-		if (!values[0].value)
+		//Use unit to store resolution
+		parsePayload(value, unit, unit, payload, 0);
+		if (!*value)
 			return CAYENNE_FAILURE;
 		break;
 #endif
@@ -521,22 +426,19 @@ int CayenneParsePayload(CayenneValuePair* values, size_t* valuesSize, const char
 	case ANALOG_COMMAND_TOPIC:
 #endif
 	case COMMAND_TOPIC:
-		parsePayload(values, valuesSize, type, payload, 0);
-		*id = *type;
-		*type = NULL;
-		if (!values[0].value)
+		parsePayload(id, value, unit, payload, 0);
+		if (!*value)
 			return CAYENNE_FAILURE;
 		break;
 	default:
 		break;
 	}
 
-	if (!values[0].value) {
-		values[0].value = payload;
-		values[0].unit = NULL;
+	if (!*value) {
+		*value = payload;
+		*unit = NULL;
 		*type = NULL;
 		*id = NULL;
-		*valuesSize = 1;
 	}
 
 	return CAYENNE_SUCCESS;

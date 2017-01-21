@@ -25,7 +25,7 @@
  * @param length the length to be encoded
  * @return the number of bytes written to buffer
  */
-int MQTTPacket_encode(unsigned char* buf, int length)
+int MQTTPacket_encode(unsigned char* buf, size_t length)
 {
 	int rc = 0;
 
@@ -76,7 +76,7 @@ exit:
 }
 
 
-int MQTTPacket_len(int rem_len)
+size_t MQTTPacket_len(size_t rem_len)
 {
 	rem_len += 1; /* header byte */
 
@@ -172,8 +172,8 @@ void writeInt(unsigned char** pptr, int anInt)
  */
 void writeCString(unsigned char** pptr, const char* string)
 {
-	int len = strlen(string);
-	writeInt(pptr, len);
+	size_t len = strlen(string);
+	writeInt(pptr, (int)len);
 	memcpy(*pptr, string, len);
 	*pptr += len;
 }
@@ -190,7 +190,7 @@ void writeMQTTString(unsigned char** pptr, MQTTString mqttstring)
 {
 	if (mqttstring.lenstring.len > 0)
 	{
-		writeInt(pptr, mqttstring.lenstring.len);
+		writeInt(pptr, (int)mqttstring.lenstring.len);
 		memcpy(*pptr, mqttstring.lenstring.data, mqttstring.lenstring.len);
 		*pptr += mqttstring.lenstring.len;
 	}
@@ -232,9 +232,9 @@ int readMQTTLenString(MQTTString* mqttstring, unsigned char** pptr, unsigned cha
  * @param mqttstring the string to return the length of
  * @return the length of the string
  */
-int MQTTstrlen(MQTTString mqttstring)
+size_t MQTTstrlen(MQTTString mqttstring)
 {
-	int rc = 0;
+	size_t rc = 0;
 
 	if (mqttstring.cstring)
 		rc = strlen(mqttstring.cstring);
@@ -252,7 +252,7 @@ int MQTTstrlen(MQTTString mqttstring)
  */
 int MQTTPacket_equals(MQTTString* a, char* bptr)
 {
-	int alen = 0,
+	size_t alen = 0,
 		blen = 0;
 	char *aptr;
 	

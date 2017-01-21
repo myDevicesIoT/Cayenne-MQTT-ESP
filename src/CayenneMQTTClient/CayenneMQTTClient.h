@@ -21,7 +21,6 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #include "MQTTClient.h"
 #include "../CayenneUtils/CayenneDefines.h"
 #include "../CayenneUtils/CayenneUtils.h"
-#include "../CayenneUtils/CayenneDataArray.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -48,8 +47,8 @@ extern "C" {
 		unsigned int channel; /**< The channel the message was received on. */
 		const char* id; /**< The message ID, if it is a command message, otherwise NULL. */
 		const char* type; /**< The type of data in the message, if it exists, otherwise NULL. */
-		CayenneValuePair values[CAYENNE_MAX_MESSAGE_VALUES]; /**< The unit/value data pairs in the message. The units and values can be NULL. */
-		size_t valueCount; /**< The count of items in the values array. */
+		const char* unit; /**< The unit in the message, if it exists, otherwise NULL. */
+		const char* value; /**< The value in the message, if it exists, otherwise NULL. */
 	} CayenneMessageData;
 
 	typedef void(*CayenneMessageHandler)(CayenneMessageData*);
@@ -188,19 +187,6 @@ extern "C" {
 	* @return success code
 	*/
 	DLLExport int CayenneMQTTPublishDataFloat(CayenneMQTTClient* client, const char* clientID, CayenneTopic topic, unsigned int channel, const char* type, const char* unit, float value);
-
-	/**
-	* Send multiple value data array to Cayenne.
-	* @param[in] client The client object
-	* @param[in] clientID The client ID to use in the topic, NULL to use the clientID the client was initialized with
-	* @param[in] topic Cayenne topic
-	* @param[in] channel The channel to send data to, or CAYENNE_NO_CHANNEL if there is none
-	* @param[in] type Optional type to use for a type=value pair, can be NULL
-	* @param[in] values Unit / value array
-	* @param[in] valueCount Number of values
-	* @return success code
-	*/
-	DLLExport int CayenneMQTTPublishDataArray(CayenneMQTTClient* client, const char* clientID, CayenneTopic topic, unsigned int channel, const char* type, const CayenneValuePair* values, size_t valueCount);
 
 	/**
 	* Send a response to a channel.

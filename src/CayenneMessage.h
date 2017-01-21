@@ -38,18 +38,18 @@ public:
 	explicit CayenneMessage(CayenneMessageData* data) : _data(data), _error(NULL) {
 	}
 
-	const char* asStr(size_t index = 0) const { return _data->values[index].value; }
-	const char* asString(size_t index = 0) const { return _data->values[index].value; }
-	int         asInt(size_t index = 0) const { return atoi(_data->values[index].value); }
-	long        asLong(size_t index = 0) const { return atol(_data->values[index].value); }
+	const char* asStr() const { return _data->value; }
+	const char* asString() const { return _data->value; }
+	int         asInt() const { return atoi(_data->value); }
+	long        asLong() const { return atol(_data->value); }
 #ifndef NO_FLOAT
-	double      asDouble(size_t index = 0) const { return atof(_data->values[index].value); }
+	double      asDouble() const { return atof(_data->value); }
 #endif
 
 	const char* getId() const { return _data->id; }
-	void*  getBuffer(size_t index = 0) const { return (void*)_data->values[index].value; }
-	size_t getLength(size_t index = 0) const { return strlen(_data->values[index].value); }
-	const char* getUnit(size_t index = 0) const { return _data->values[index].unit; }
+	void*  getBuffer() const { return (void*)_data->value; }
+	size_t getLength() const { return strlen(_data->value); }
+	const char* getUnit() const { return _data->unit; }
 	void setError(char* error) { _error = error; }
 	const char* getError() const { return _error; }
 

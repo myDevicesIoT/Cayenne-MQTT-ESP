@@ -24,11 +24,11 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define CAYENNE_TLS_PORT 8883
 
 #ifndef CAYENNE_MAX_MESSAGE_SIZE
-#define CAYENNE_MAX_MESSAGE_SIZE 134 // Redefine this for different message size
+#define CAYENNE_MAX_MESSAGE_SIZE 140 // Redefine this for different message size
 #endif
 
-#ifndef CAYENNE_MAX_PAYLOAD_SIZE
-#define CAYENNE_MAX_PAYLOAD_SIZE 64 // Redefine this for different payload size
+#ifndef CAYENNE_MAX_PAYLOAD_VALUE_SIZE
+#define CAYENNE_MAX_PAYLOAD_VALUE_SIZE 35 // Redefine this for different payload value size
 #endif
 
 #ifndef CAYENNE_MAX_MESSAGE_HANDLERS
