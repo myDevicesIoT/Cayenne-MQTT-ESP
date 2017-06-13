@@ -59,8 +59,8 @@
 
 	#elif defined(ESP8266)
 	#define INFO_CPU      "Xtensa32"
-  #elif defined(ESP32)
-  #define INFO_CPU      "XtensaLX6"
+	#elif defined(ESP32)
+	#define INFO_CPU      "XtensaLX6"
 	#endif
 #endif
 

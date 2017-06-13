@@ -1,5 +1,5 @@
-// This example shows how to connect to Cayenne using an ESP8266 and send/receive sample data.
-// Make sure you install the ESP8266 Board Package via the Arduino IDE Board Manager and select the correct ESP8266 board before compiling.
+// This example shows how to connect to Cayenne using an ESP32 and send/receive sample data.
+// Make sure you install the ESP32 Board Package via the Arduino IDE Board Manager and select the correct ESP32 board before compiling.
 
 //#define CAYENNE_DEBUG
 #define CAYENNE_PRINT Serial
