@@ -1,6 +1,8 @@
 // This example shows how to connect to Cayenne using an ESP32 and send/receive sample data.
 // Make sure you install the ESP32 Board Package via the Arduino IDE Board Manager and select the correct ESP32 board before compiling.
 
+// Tested: IntoRobot Fig, NodeMCU-32S
+
 //#define CAYENNE_DEBUG
 #define CAYENNE_PRINT Serial
 #include <CayenneMQTTESP32.h>
