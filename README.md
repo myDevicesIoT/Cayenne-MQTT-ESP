@@ -7,7 +7,7 @@ The Cayenne MQTT ESP Library provides functions to easily connect to the [Cayenn
 
 ![alt text](https://cdn.sparkfun.com//assets/parts/1/1/5/6/4/13907-01.jpg)
 
-[SparkFun ESP32 Thing image](https://www.sparkfun.com/products/13907) by [SparkFun](https://www.sparkfun.com) licensed under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/)
+[SparkFun ESP32 Thing image](https://www.sparkfun.com/products/13907) by [SparkFun](https://www.sparkfun.com) is licensed under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/)
 
 ## Requirements
 ### Hardware
