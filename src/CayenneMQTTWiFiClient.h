@@ -39,8 +39,10 @@ public:
 	void begin(const char* username, const char* password, const char* clientID, const char* ssid, const char* wifiPassword)
 	{
 		int status = WL_IDLE_STATUS;
+		WiFi.mode(WIFI_STA);
+		delay(500);
 		if (WiFi.status() == WL_NO_SHIELD) {
-			CAYENNE_LOG("WiFi shield not present");
+			CAYENNE_LOG("WiFi not present");
 			while (true);
 		}
 
