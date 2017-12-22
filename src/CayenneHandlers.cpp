@@ -49,7 +49,7 @@ CAYENNE_CONNECTED() __attribute__((weak, alias("EmptyHandler")));
 CAYENNE_DISCONNECTED() __attribute__((weak, alias("EmptyHandler")));
 
 CAYENNE_IN_IMPL(Default);
-CAYENNE_OUT_IMPL(Default);
+CAYENNE_OUT_DEFAULT() __attribute__((weak, alias("EmptyHandler")));;
 
 CAYENNE_IN_IMPL(0);
 CAYENNE_IN_IMPL(1);

@@ -29,7 +29,6 @@ class CayenneArduinoMQTTClient
 {
 public:
 
-	static uint32_t virtualChannels[MAX_CHANNEL_ARRAY_SIZE];
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 	static uint32_t digitalChannels[MAX_CHANNEL_ARRAY_SIZE];
 	static uint32_t analogChannels[MAX_CHANNEL_ARRAY_SIZE];
@@ -71,7 +70,6 @@ public:
 		CAYENNE_LOG("Connected");
 		CayenneConnected();
 		CayenneMQTTSubscribe(&_mqttClient, NULL, COMMAND_TOPIC, CAYENNE_ALL_CHANNELS, NULL);
-		CayenneMQTTSubscribe(&_mqttClient, NULL, CONFIG_TOPIC, CAYENNE_ALL_CHANNELS, NULL);
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 		CayenneMQTTSubscribe(&_mqttClient, NULL, DIGITAL_COMMAND_TOPIC, CAYENNE_ALL_CHANNELS, NULL);
 		CayenneMQTTSubscribe(&_mqttClient, NULL, DIGITAL_CONFIG_TOPIC, CAYENNE_ALL_CHANNELS, NULL);
@@ -92,7 +90,12 @@ public:
 	*/
 	void loop(int yieldTime = 1000) {
 		CayenneMQTTYield(&_mqttClient, yieldTime);
-		pollChannels(virtualChannels);
+		static unsigned long lastPoll = millis() - 15000;
+		if (millis() - lastPoll > 15000) {
+			lastPoll = millis();
+			pollVirtualChannels();
+		}
+		
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 		pollChannels(digitalChannels);
 		pollChannels(analogChannels);
@@ -275,6 +278,17 @@ public:
 	}
 
 	/**
+	* Sends a digital sensor value to a Cayenne channel
+	*
+	* @param channel  Cayenne channel number
+	* @param value  Value to be sent
+	*/
+	void digitalSensorWrite(unsigned int channel, float value)
+	{
+		virtualWrite(channel, value, CAYENNE_FLASH(TYPE_DIGITAL_SENSOR), CAYENNE_FLASH(UNIT_DIGITAL));
+	}
+
+	/**
 	* Requests Server to re-send current values for all widgets.
 	*/
 	void syncAll()
@@ -380,6 +394,24 @@ private:
 #endif
 
 	/**
+	* Call enabled virtual channel handlers to send channel data.
+	*/
+	void pollVirtualChannels()
+	{
+		for (unsigned int channel = 0; channel < 32; ++channel) {
+			Request request = { channel };
+			OutputHandlerFunction handler = GetOutputHandler(request.channel);
+			if (handler && handler != OutputHandler) {
+				handler(request);
+			}
+		}
+		if (CayenneOutDefault != EmptyHandler) {
+			CayenneOutDefault();
+		}
+	}
+
+#ifdef DIGITAL_AND_ANALOG_SUPPORT
+	/**
 	* Polls enabled digital channels and sends the matching pin's current value.
 	*/
 	void pollChannels(uint32_t channelArray[])
@@ -389,20 +421,7 @@ private:
 				for (size_t flag = 0; flag < 32; ++flag) {
 					if (channelArray[index] & ((uint32_t)1 << flag)) {
 						unsigned int channel = flag + (index * 32);
-						if (channelArray == virtualChannels)
-						{
-							CAYENNE_LOG_DEBUG("Send channel %d", channel);
-							Request request = { channel };
-							OutputHandlerFunction handler = GetOutputHandler(request.channel);
-							if (handler && handler != OutputHandler) {
-								handler(request);
-							}
-							else {
-								OutputHandlerDefault(request);
-							}
-						}
-#ifdef DIGITAL_AND_ANALOG_SUPPORT
-						else if (channelArray == digitalChannels)
+						if (channelArray == digitalChannels)
 						{
 							CAYENNE_LOG_DEBUG("Send digital channel %d %d", channel, digitalRead(channel));
 							publishData(DIGITAL_TOPIC, channel, digitalRead(channel));
@@ -412,23 +431,21 @@ private:
 							CAYENNE_LOG_DEBUG("Send analog channel %d %d", channel, analogRead(channel));
 							publishData(ANALOG_TOPIC, channel, analogRead(channel));
 						}
-#endif
 					}
 				}
 			}
 		}
 	}
+#endif
 
 	static CayenneMQTTClient _mqttClient;
 	Network _network;
 };
 
 CayenneMQTTClient CayenneArduinoMQTTClient::_mqttClient;
-uint32_t CayenneArduinoMQTTClient::virtualChannels[MAX_CHANNEL_ARRAY_SIZE] = { 0 };
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 uint32_t CayenneArduinoMQTTClient::digitalChannels[MAX_CHANNEL_ARRAY_SIZE] = { 0 };
 uint32_t CayenneArduinoMQTTClient::analogChannels[MAX_CHANNEL_ARRAY_SIZE] = { 0 };
-#endif
 
 void configChannel(uint32_t channelArray[], uint8_t channel, const char* bytes) {
 	CAYENNE_LOG_DEBUG("configChannel: %d %s", channel, bytes);
@@ -445,6 +462,7 @@ void configChannel(uint32_t channelArray[], uint8_t channel, const char* bytes) 
 		}
 	}
 }
+#endif
 
 void handleMessage(CayenneMessageData* messageData) {
 	Request request = { messageData->channel };
@@ -515,9 +533,6 @@ void CayenneMessageArrived(CayenneMessageData* message) {
 	{
 	case COMMAND_TOPIC:
 		handleMessage(message);
-		break;
-	case CONFIG_TOPIC:
-		configChannel(CayenneArduinoMQTTClient::virtualChannels, message->channel, message->values[0].value);
 		break;
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 	case DIGITAL_COMMAND_TOPIC:
