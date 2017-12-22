@@ -22,15 +22,15 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 	#ifdef PARSE_INFO_PAYLOADS
-		#define PARSE_TOPICS_COUNT 13
+		#define PARSE_TOPICS_COUNT 12
 	#else
-		#define PARSE_TOPICS_COUNT 6
+		#define PARSE_TOPICS_COUNT 5
 	#endif
 #else
 	#ifdef PARSE_INFO_PAYLOADS
-		#define PARSE_TOPICS_COUNT 7
+		#define PARSE_TOPICS_COUNT 6
 	#else
-		#define PARSE_TOPICS_COUNT 2
+		#define PARSE_TOPICS_COUNT 1
 	#endif
 #endif
 
@@ -86,9 +86,6 @@ int buildSuffix(char* suffix, size_t length, const CayenneTopic topic, unsigned 
 	{
 	case COMMAND_TOPIC:
 		topicString = COMMAND_STRING;
-		break;
-	case CONFIG_TOPIC:
-		topicString = CONFIG_STRING;
 		break;
 	case DATA_TOPIC:
 		topicString = DATA_STRING;
@@ -403,7 +400,7 @@ int CayenneBuildResponsePayload(char* payload, size_t* length, const char* id, c
 int CayenneParseTopic(CayenneTopic* topic, unsigned int* channel, const char** clientID, const char* username, char* topicName, unsigned int length) {
 	char* index = NULL;
 	int i = 0;
-	TopicChannel parseTopics[PARSE_TOPICS_COUNT] = { { COMMAND_TOPIC, CAYENNE_ALL_CHANNELS },{ CONFIG_TOPIC, CAYENNE_ALL_CHANNELS },
+	TopicChannel parseTopics[PARSE_TOPICS_COUNT] = { { COMMAND_TOPIC, CAYENNE_ALL_CHANNELS },
 #ifdef DIGITAL_AND_ANALOG_SUPPORT
 		{ ANALOG_COMMAND_TOPIC, CAYENNE_ALL_CHANNELS },{ ANALOG_CONFIG_TOPIC, CAYENNE_ALL_CHANNELS },{ DIGITAL_COMMAND_TOPIC, CAYENNE_ALL_CHANNELS },{ DIGITAL_CONFIG_TOPIC, CAYENNE_ALL_CHANNELS },
 #ifdef PARSE_INFO_PAYLOADS

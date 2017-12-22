@@ -24,7 +24,6 @@ typedef enum CayenneTopic
 	UNDEFINED_TOPIC,
 	DATA_TOPIC,
 	COMMAND_TOPIC,
-	CONFIG_TOPIC,
 	RESPONSE_TOPIC,
 	SYS_MODEL_TOPIC,
 	SYS_VERSION_TOPIC,
@@ -42,7 +41,6 @@ typedef enum CayenneTopic
 
 #define DATA_STRING CAYENNE_PSTR("data")
 #define COMMAND_STRING CAYENNE_PSTR("cmd")
-#define CONFIG_STRING CAYENNE_PSTR("conf")
 #define RESPONSE_STRING CAYENNE_PSTR("response")
 #define SYS_MODEL_STRING CAYENNE_PSTR("sys/model")
 #define SYS_VERSION_STRING CAYENNE_PSTR("sys/version")

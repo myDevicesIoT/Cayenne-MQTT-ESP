@@ -62,12 +62,16 @@ Code adapted from Blynk library BlynkHandlers.h. Copyright info below.
 #define V30 30
 #define V31 31
 
-//Input & Output handlers
-#define CAYENNE_IN(channel) void InputHandler ## channel (Request& request, CayenneMessage& getValue)
-#define CAYENNE_OUT(channel) void OutputHandler ## channel  (Request& request)
+// Input & Output handlers
+// Two IN & OUT handler macros are used to allow processing the channel value correctly if a macro is used
+// for the channel when declaring the handler, e.g. CAYENNE_IN(V1).
+#define CAYENNE_IN_2(channel) void InputHandler ## channel (Request& request, CayenneMessage& getValue)
+#define CAYENNE_OUT_2(channel) void OutputHandler ## channel  (Request& request)
+#define CAYENNE_IN(channel) CAYENNE_IN_2(channel)
+#define CAYENNE_OUT(channel) CAYENNE_OUT_2(channel)
 
 #define CAYENNE_IN_DEFAULT()   CAYENNE_IN(Default)
-#define CAYENNE_OUT_DEFAULT()  CAYENNE_OUT(Default)
+#define CAYENNE_OUT_DEFAULT()  void CayenneOutDefault()
 
 // Additional handlers
 #define CAYENNE_CONNECTED()    void CayenneConnected()
