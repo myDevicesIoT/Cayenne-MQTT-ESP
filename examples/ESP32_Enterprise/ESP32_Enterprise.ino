@@ -8,7 +8,7 @@
 /*|CORE: June 2018                                           |*/
 /*|----------------------------------------------------------|*/
 //#define CAYENNE_DEBUG
-#include <CayenneMQTTESP32.h>
+#include <CayenneMQTTESP32Enterprise.h>
 #include "esp_wpa2.h"
 #define CAYENNE_PRINT Serial
 // WiFi network info.
