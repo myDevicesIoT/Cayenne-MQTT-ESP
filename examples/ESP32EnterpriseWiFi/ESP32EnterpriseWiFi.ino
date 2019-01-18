@@ -1,21 +1,22 @@
-// This example shows how to connect to Cayenne using an ESP32 and send/receive sample data.
+// This example shows how to connect to Cayenne using an ESP32 over Enterprise WiFi and send/receive sample data.
 // Make sure you install the ESP32 Board Package and select the correct ESP32 board before compiling.
 // To install the ESP32 Board Package follow the instructions here: https://github.com/espressif/arduino-esp32/blob/master/README.md#installation-instructions.
 /*|----------------------------------------------------------|*/
-/*|CAYENNE ENTERPRISE connection                             |*/
+/*|Cayenne ESP32 Enterprise WiFi connection                  |*/
 /*|EMAIL: martinius96@gmail.com                              |*/
-/*|NOT TESTED OFFICIALY YET                                  |*/
+/*|NOT TESTED OFFICIALLY                                     |*/
 /*|CORE: June 2018                                           |*/
 /*|----------------------------------------------------------|*/
+
 //#define CAYENNE_DEBUG
-#include <CayenneMQTTESP32Enterprise.h>
-#include "esp_wpa2.h"
 #define CAYENNE_PRINT Serial
-// WiFi network info.
-char EAP_ANONYMOUS_IDENTITY[] = "anonymous@example.com";
-char EAP_IDENTITY[] = "nickname@example.com";
-char EAP_PASSWORD[] = "EDUROAM_PASSWORD";
-const char* ssid = "eduroam"; // Eduroam SSID
+#include <CayenneMQTTESP32.h>
+
+// Enterprise WiFi network info.
+const char* ssid = "ssid";
+char anonymousIdentity[] = "anonymous@example.com";
+char identity[] = "nickname@example.com";
+char wifiPassword[] = "wifiPassword";
 
 // Cayenne authentication info. This should be obtained from the Cayenne Dashboard.
 char username[] = "MQTT_USERNAME";
@@ -26,7 +27,7 @@ unsigned long lastMillis = 0;
 
 void setup() {
 	Serial.begin(9600);
-	Cayenne.begin(username, password, clientID, ssid, EAP_ANONYMOUS_IDENTITY, EAP_IDENTITY, EAP_PASSWORD);
+	Cayenne.begin(username, password, clientID, ssid, anonymousIdentity, identity, wifiPassword);
 }
 
 void loop() {
