@@ -206,7 +206,7 @@ int getValueCount(size_t* count, char* payload, char token) {
 	}
 
 	*count = 0;
-	while (*index && index != '\0') {
+	while (index && *index != '\0') {
 		if ((*index == ',') || (*index == token)) {
 			if (*index == ',') {
 				if (countingValues) {
@@ -266,7 +266,7 @@ int parsePayload(CayenneValuePair* values, size_t* valuesSize, const char** type
 	values[0].value = NULL;
 	values[0].unit = NULL;
 	*type = NULL;
-	while (*index && index != '\0') {
+	while (index && *index != '\0') {
 		if ((*index == ',') || (*index == token)) {
 			if (*index == ',') {
 				*type = payload;
